@@ -1,0 +1,35 @@
+---
+title: "GitLab"
+description: "Connect GitLab for codebase analysis and automatic merge request creation"
+icon: "gitlab"
+---
+
+Sonarly connects to GitLab via OAuth to access your repositories, analyze your code, and create merge requests with fixes.
+
+## Connect GitLab
+
+<Steps>
+  <Step title="Authorize">
+    Click **Connect GitLab** from the onboarding page or Settings. Authorize Sonarly with your GitLab account.
+  </Step>
+  <Step title="Select repositories">
+    Choose which repositories Sonarly can access.
+  </Step>
+  <Step title="Done">
+    Sonarly can now clone your repos, analyze code, and create MRs.
+  </Step>
+</Steps>
+
+## Self-hosted GitLab
+
+Sonarly supports self-hosted GitLab instances. During setup, enter your GitLab instance URL (e.g. `https://gitlab.mycompany.com`) instead of using gitlab.com.
+
+## What Sonarly does with GitLab access
+
+- **Clone repositories** into isolated sandboxes for code analysis
+- **Create merge requests** with fixes, root cause analysis, and git blame
+- **Auto-remove source branch** after MR is merged
+
+## Token management
+
+Sonarly uses standard OAuth 2.0 with 2-hour token expiry. Tokens are encrypted at rest and refreshed automatically before expiry. You can disconnect GitLab at any time from Settings.

@@ -1,71 +1,50 @@
 ---
 title: "FAQ"
-description: "Common questions and troubleshooting"
+description: "Frequently asked questions about Sonarly"
 ---
 
-## Common questions
-
 <AccordionGroup>
-  <Accordion title="What is Sonarly?">
-    Sonarly is an AI-first debugging platform that captures user sessions, detects bugs automatically, and generates LLM-ready context to fix them with your coding agent (Cursor, Claude, Windsurf, etc.).
+  <Accordion title="How long does setup take?">
+    About 2 minutes. Sign up, connect your alert sources (Sentry, Datadog, Grafana, PagerDuty, etc.) and the AI starts triaging immediately. No SDK, no code changes.
   </Accordion>
 
-  <Accordion title="How does the one-click configuration work?">
-    Copy the config prompt from your Sonarly dashboard and paste it into your coding agent (Cursor, Claude, Windsurf). Your agent will automatically install the tracker, configure sourcemaps, and set up backend tracing.
+  <Accordion title="Does Sonarly replace my existing tools?">
+    No. Sonarly sits on top of your existing stack. Your tools collect alerts — Sonarly triages them, finds root causes in your code, and opens a PR with the fix.
   </Accordion>
 
-  <Accordion title="What frameworks does Sonarly support?">
-    Frontend: React, Vue, Svelte, Angular, and vanilla JS. Backend: Express, NestJS, Fastify, Django, FastAPI, Flask. See the [supported stacks](/supported-stacks) page for details.
+  <Accordion title="How long does AI analysis take?">
+    Initial triage (severity, title, description) takes seconds. Deep code analysis with root cause and PR generation takes 2-5 minutes per issue.
   </Accordion>
 
-  <Accordion title="How do AI-powered alerts work?">
-    Sonarly detects errors from frontend and backend, clusters similar issues using AI, and sends email alerts only for critical issues with full context (file, line, function, occurrence count).
+  <Accordion title="Will Sonarly auto-merge PRs?">
+    Never. PRs are created for your review. You control when and whether to merge.
   </Accordion>
 
-  <Accordion title="What is LLM-ready context?">
-    When a bug is detected, you can copy the full context (error, location, network requests, console logs, backend traces) and paste it directly into your coding agent to fix the bug.
+  <Accordion title="Will Sonarly modify my Sentry/Datadog data?">
+    No. Sonarly only requests read permissions from your tools. We never resolve issues, change assignments, or update anything in your connected platforms.
   </Accordion>
 
-  <Accordion title="Is my data secure?">
-    Yes. Your data is encrypted in transit and at rest. You control what data is captured (sensitive inputs are masked by default). We never share your data with third parties.
+  <Accordion title="How does deduplication work?">
+    Multiple tiers: exact ID matching, error message fingerprinting, and AI semantic comparison. After code analysis, a second pass catches errors with different messages but the same root cause. This typically reduces alert noise by up to 80%.
+  </Accordion>
+
+  <Accordion title="Is my code secure?">
+    Yes. SOC 2 Type 2 certified. Code runs in isolated sandboxes with 24h TTL. API keys never leave the backend. We never store your source code permanently. See [Security](/security) for details.
+  </Accordion>
+
+  <Accordion title="Do you support self-hosted GitLab?">
+    Yes. Enter your GitLab instance URL during setup and Sonarly will connect to your self-hosted instance.
+  </Accordion>
+
+  <Accordion title="Can I use multiple alert sources at the same time?">
+    Yes. Connect Sentry, Datadog, Grafana, PagerDuty, and any other supported tool simultaneously. All alerts flow into the same unified Issues page.
+  </Accordion>
+
+  <Accordion title="What AI models does Sonarly use?">
+    Gemini 2.5 Flash for fast triage and deduplication. Claude Code (Anthropic) for deep codebase analysis, root cause identification, and fix generation.
+  </Accordion>
+
+  <Accordion title="How can I contact support?">
+    Email us at [founders@sonarly.dev](mailto:founders@sonarly.dev) or join our [Discord](https://discord.gg/9XDVzde4G4).
   </Accordion>
 </AccordionGroup>
-
-## Troubleshooting
-
-<AccordionGroup>
-  <Accordion title="Tracker not connecting">
-    Check that:
-    - Your `projectKey` is correct
-    - `ingestPoint` is set to `https://sonarly.dev/ingest`
-    - Enable debug mode: `__debug__: 5`
-    
-    If issues persist, contact us at founders@sonarly.dev
-  </Accordion>
-
-  <Accordion title="Sourcemaps not working">
-    Verify that:
-    - `.map` files are generated in your build
-    - Upload command succeeded (no 404 errors)
-    - Sourcemap paths match production URLs
-  </Accordion>
-
-  <Accordion title="Backend traces not appearing">
-    Check that:
-    - DSN format is correct: `https://KEY@sonarly.dev/ID`
-    - `tracesSampleRate` is set to `1.0`
-    - Backend was restarted after configuration
-    - CORS allows `x-sonarly-session-id` header
-  </Accordion>
-</AccordionGroup>
-
-## Need more help?
-
-<Card
-  title="Contact support"
-  icon="headset"
-  href="mailto:founders@sonarly.dev"
-  horizontal
->
-  Reach out to our team at founders@sonarly.dev
-</Card>

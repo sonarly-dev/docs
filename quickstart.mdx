@@ -1,377 +1,81 @@
-# Sonarly Documentation
-
-> **AI-Powered Error & Incident Analysis Platform**
-
-Transform noisy alerts into clear, actionable bug reports. Connect your observability tools, and let AI handle the triage.
-
+---
+title: "Quick Start"
+description: "Get from signup to your first AI-generated fix in under 5 minutes"
 ---
 
-## Glossary
-
-### Error Monitoring Triage (Sentry / Bugsnag)
-
-Connect your error tracking platform to Sonarly. We automatically:
-
-- **Import** your latest issues via OAuth
-- **Analyze** each error with AI to generate user-friendly descriptions
-- **Deduplicate** similar errors into intelligent groups
-- **Classify severity** as Blocking, Annoying, or Harmless
-- **Present actionable bug cards** ready for your dev team
-
-**Supported platforms**: Sentry, Bugsnag
-
----
-
-### AI Code Analysis & PR Generation (Claude Code)
-
-When you click "Analyze with Claude Code" on any bug:
-
-- A **sandboxed environment** spins up in milliseconds
-- Your **GitHub repo is cloned** securely
-- Claude Code **explores your codebase**, finds the root cause
-- A **fix is generated** and committed to a new branch
-- A **Pull Request is created** automatically with:
-  - Bug summary & severity
-  - Root cause analysis
-  - Code changes explained
-  - Testing suggestions
-
-**No manual investigation needed** — go from alert to PR in minutes.
-
----
-
-### Incident Response Agent (Datadog, PagerDuty, Grafana...)
-
-Receive alerts from your incident management platforms via webhooks. Sonarly's Observability Agent:
-
-- **Captures incident context** (title, severity, service, tags)
-- **Queries your logs** (CloudWatch, Datadog, etc.) to gather evidence
-- **Analyzes root cause** using Claude Code with full observability skills
-- **Generates a detailed incident report** with timeline and suggested actions
-- **Optionally creates PRs** for identified code issues
-
-**Supported platforms**: PagerDuty, Incident.io, Datadog, Grafana, Opsgenie, SigNoz
-
----
-
-### Slack Integration
-
-Connect Slack to receive bug reports directly in your channels:
-
-- **OAuth connection** to your Slack workspace
-- **Configurable delivery** — receive reports via Email, Slack, or both
-- **Scheduled digests** — choose your frequency (24h, 12h, 6h, 1h)
-- **Rich messages** with bug severity, occurrence count, and direct links
-- **Channel selection** — pick which channel receives alerts
-
----
-
-## Quick Start
-
-### 1. Sign Up
-
-Visit [sonarly.dev](https://sonarly.dev) and create your account. You'll automatically get a tenant for your organization.
-
-### 2. Connect Your Error Tracker
-
-Choose your platform:
-
-**Sentry** (recommended):
-
-1. Click "Connect Sentry"
-2. Authorize via OAuth
-3. Select your project
-4. Click "Start Analysis"
-
-**Bugsnag**:
-
-1. Click "Connect Bugsnag"
-2. Authorize via OAuth
-3. Select your project
-4. Configure import settings
-
-### 3. Connect Your Codebase (Optional)
-
-Enable AI-powered code analysis:
-
-1. Click "Connect GitHub"
-2. Authorize the Sonarly GitHub App
-3. Select which repositories to analyze
-
-### 4. Connect Slack (Optional)
-
-Get bug reports in Slack:
-
-1. Go to Settings → Integrations → Slack
-2. Click "Connect Slack"
-3. Authorize and select your channel
-4. Configure delivery preferences
-
-### 5. Connect Incident Platforms (Optional)
-
-Set up webhooks for real-time incident analysis:
-
-1. Go to Settings → Integrations → Webhooks
-2. Copy your webhook URL
-3. Configure in your incident platform (PagerDuty, Datadog, etc.)
-
----
-
-## Features
-
-### Error Monitoring
-
-| Feature                     | Description                                                |
-| --------------------------- | ---------------------------------------------------------- |
-| **OAuth Connection**        | Secure, one-click connection to Sentry/Bugsnag             |
-| **Automatic Import**        | Fetch your latest 100+ issues automatically                |
-| **AI Analysis**             | GPT-powered analysis of each error                         |
-| **Smart Deduplication**     | 3-tier dedup: ID match → message fingerprint → semantic AI |
-| **Severity Classification** | Blocking, Annoying, or Harmless                            |
-| **Scheduled Syncs**         | Auto-refresh at your chosen interval                       |
-| **Real-time Progress**      | Watch the import happen live                               |
-
-### AI Code Analysis
-
-| Feature                | Description                                       |
-| ---------------------- | ------------------------------------------------- |
-| **One-Click Analysis** | Click "Analyze" on any bug to start               |
-| **Sandbox Execution**  | Secure, isolated environments via Blaxel          |
-| **GitHub Integration** | Clone repos, create branches, push commits        |
-| **Automatic PRs**      | Rich PR body with bug context and fix explanation |
-| **Fast Resume**        | Sandboxes resume in under 25ms after first run    |
-| **Cursor Integration** | Alternative: analyze in your IDE with Cursor      |
-
-### Incident Response
-
-| Feature                    | Description                                                |
-| -------------------------- | ---------------------------------------------------------- |
-| **Webhook Receivers**      | PagerDuty, Incident.io, Datadog, Grafana, Opsgenie, SigNoz |
-| **Log Analysis**           | Query CloudWatch, Datadog logs around incident time        |
-| **Root Cause Detection**   | AI analyzes logs + code to find the issue                  |
-| **Incident Timeline**      | Structured report of what happened and when                |
-| **Signature Verification** | Secure webhook validation                                  |
-
-### Notifications
-
-| Feature                    | Description                          |
-| -------------------------- | ------------------------------------ |
-| **Slack**                  | Rich messages to your chosen channel |
-| **Email**                  | Digest emails with new bugs          |
-| **Configurable Frequency** | 1h, 6h, 12h, or 24h digests          |
-| **Multiple Delivery**      | Email only, Slack only, or both      |
-
----
-
-## How It Works
-
-### Error Import Flow
-
-```
-Your Sentry/Bugsnag Account
-           ↓
-   OAuth Connection
-           ↓
-   Fetch Latest Issues
-           ↓
-   For Each Issue:
-   ├─ Check if already imported → Skip
-   ├─ Check exact message match → Fast dedup
-   └─ AI analysis + semantic dedup
-           ↓
-   Deduplicated Bug Cards
-           ↓
-   Dashboard Display
-```
-
-### Code Analysis Flow
-
-```
-Bug Card → "Analyze with Claude Code"
-           ↓
-   Create/Resume Sandbox (under 25ms)
-           ↓
-   Clone GitHub Repository
-           ↓
-   Claude Code Explores Codebase
-   ├─ Find error location
-   ├─ Understand context
-   └─ Generate fix
-           ↓
-   Create Branch + Commit
-           ↓
-   Open Pull Request
-           ↓
-   PR Link in Bug Card
-```
-
-### Incident Response Flow
-
-```
-Incident Alert (PagerDuty, Datadog...)
-           ↓
-   Webhook → Sonarly API
-           ↓
-   Parse Incident Context
-           ↓
-   Query Logs (CloudWatch, etc.)
-           ↓
-   Claude Code Analyzes:
-   ├─ Incident timeline
-   ├─ Log patterns
-   └─ Code correlation
-           ↓
-   Incident Report + (Optional) PR
-```
-
----
-
-## Supported Integrations
-
-### Error Tracking Platforms
-
-| Platform    | Features                       |
-| ----------- | ------------------------------ |
-| **Sentry**  | OAuth, import, dedup, webhooks |
-| **Bugsnag** | OAuth, import, dedup, webhooks |
-
-### Code Platforms
-
-| Platform   | Features                     |
-| ---------- | ---------------------------- |
-| **GitHub** | Clone, analyze, create PRs   |
-| **Cursor** | IDE-based real-time analysis |
-
-### Incident Platforms
-
-| Platform        | Webhook URL                                  |
-| --------------- | -------------------------------------------- |
-| **PagerDuty**   | `/api/webhooks/pagerduty?tenant_id=YOUR_ID`  |
-| **Incident.io** | `/api/webhooks/incidentio?tenant_id=YOUR_ID` |
-| **Datadog**     | `/api/webhooks/datadog?tenant_id=YOUR_ID`    |
-| **Grafana**     | `/api/webhooks/grafana?tenant_id=YOUR_ID`    |
-| **Opsgenie**    | `/api/webhooks/opsgenie?tenant_id=YOUR_ID`   |
-| **SigNoz**      | `/api/webhooks/signoz?tenant_id=YOUR_ID`     |
-
-### Notifications
-
-| Platform     | Features                                |
-| ------------ | --------------------------------------- |
-| **Slack**    | OAuth, channel selection, rich messages |
-| **Email**    | Digest emails, HTML formatting          |
-| **MS Teams** | Webhook integration                     |
-
----
-
-## Severity Classification
-
-Sonarly automatically classifies each bug by user impact:
-
-| Severity        | Description                           | Example                      |
-| --------------- | ------------------------------------- | ---------------------------- |
-| 🔴 **Blocking** | User cannot complete their task       | Login fails, payment broken  |
-| 🟠 **Annoying** | Degraded experience but task possible | Slow loading, UI glitches    |
-| 🟢 **Harmless** | User unlikely to notice               | Console warnings, minor logs |
-
----
-
-## AI Models
-
-| Use Case               | Model                        |
-| ---------------------- | ---------------------------- |
-| **Error Analysis**     | Google Gemini 2.5 Flash Lite |
-| **Code Analysis**      | Claude Sonnet 4              |
-| **Cursor Integration** | Claude (via Cursor)          |
-
----
-
-## Data & Security
-
-### Token Storage
-
-- All OAuth tokens are **encrypted at rest**
-- Encryption via industry-standard Fernet (AES)
-- Tokens refresh automatically before expiry
-
-### Scopes Requested
-
-- **Sentry**: `org:read`, `project:read`, `event:read` (read-only)
-- **Bugsnag**: `read:organizations`, `read:errors`, `read:projects` (read-only)
-- **GitHub**: `contents:read`, `contents:write`, `pull_requests:write`
-- **Slack**: `chat:write`, `channels:read`, `groups:read`
-
-### Data Retention
-
-- Imported errors retained for 90 days by default
-- Configurable per tenant
-- User can request data deletion anytime
-
-### Webhook Security
-
-- All webhooks support **signature verification**
-- PagerDuty: X-PagerDuty-Signature header
-- Datadog: DD-WEBHOOK-SIGNATURE header
-- Incident.io: webhook-signature header
-
----
-
-## FAQ
-
-**Q: How long does error import take?** A: Typically 1-5 minutes for 100 issues. Progress shows in real-time.
-
-**Q: How long does code analysis take?** A: 2-5 minutes for the first run. Subsequent runs resume in under 25ms.
-
-**Q: Will Sonarly modify my Sentry/Bugsnag data?** A: No. We only request read permissions.
-
-**Q: Will Sonarly auto-merge PRs?** A: No. PRs are created for your review. You control when to merge.
-
-**Q: Can I use multiple error tracking platforms?** A: Yes! Connect both Sentry and Bugsnag simultaneously.
-
-**Q: What if I don't connect GitHub?** A: Sonarly works standalone. Code analysis is optional.
-
-**Q: How are errors deduplicated?** A: Three-tier approach:
-
-1. Exact ID match (instant)
-2. Error message fingerprint (fast)
-3. AI semantic analysis (smart)
-
-**Q: Can I customize the AI prompts?** A: Contact support for enterprise customization options.
-
-**Q: Do you support self-hosted Sentry?** A: Yes! Set your Sentry API host in configuration.
-
-**Q: Is there a free tier?** A: Contact us at [hello@sonarly.dev](mailto:hello@sonarly.dev) for pricing.
-
----
-
-## Getting Help
-
-- **Documentation**: [sonarly.dev/docs](https://sonarly.dev/docs)
-- **Email**: [hello@sonarly.dev](mailto:hello@sonarly.dev)
-- **Status**: [status.sonarly.dev](https://status.sonarly.dev)
-
----
-
-## Changelog
-
-### February 2026
-
-- ✅ Slack integration with OAuth
-- ✅ Incident response webhooks (PagerDuty, Datadog, Grafana, Opsgenie, Incident.io, SigNoz)
-- ✅ Observability Agent with CloudWatch log analysis
-- ✅ Improved PR generation with rich body
-- ✅ Cursor Cloud Agents integration
-
-### January 2026
-
-- ✅ Claude Code integration via Blaxel sandboxes
-- ✅ GitHub OAuth and PR creation
-- ✅ Sentry import and AI analysis
-- ✅ Smart deduplication (3-tier)
-- ✅ Severity classification
-- ✅ Scheduled syncs and email digests
-
----
-
-**Sonarly** — From Alert to Action in Minutes.
-
-_Last Updated: February 2026_
+## 1. Create your account
+
+Go to [sonarly.dev](https://sonarly.dev) and sign up with GitHub, GitLab, or Google. Your organization is created automatically.
+
+## 2. Connect an alert source
+
+Pick the tool you use most. You only need one to get started.
+
+<Tabs>
+  <Tab title="Sentry">
+    1. Click **Connect Sentry** on the onboarding page
+    2. Authorize via OAuth (read-only permissions)
+    3. Select a Sentry project to monitor
+    4. Click **Start Import** — Sonarly fetches your unresolved issues and begins AI analysis
+
+    Real-time webhooks are also configured automatically so new Sentry issues are analyzed instantly.
+  </Tab>
+  <Tab title="Datadog">
+    1. Go to **Connect Datadog**
+    2. Enter your API Key, Application Key, and site (e.g. `us5.datadoghq.com`)
+    3. Sonarly validates your credentials and auto-creates a webhook in your Datadog account
+    4. New Datadog alerts trigger automatic incident analysis
+  </Tab>
+  <Tab title="Grafana">
+    1. Go to **Connect Grafana**
+    2. Enter your Grafana URL and a service account token (Viewer role)
+    3. Sonarly auto-creates a webhook contact point in Grafana
+    4. Alert notifications are routed to Sonarly automatically
+  </Tab>
+  <Tab title="PagerDuty / Incident.io / Opsgenie">
+    1. Go to **Settings** in your Sonarly dashboard
+    2. Copy the webhook URL for your platform
+    3. Add the webhook in your incident management platform settings
+    4. Incoming incidents trigger automatic investigation
+  </Tab>
+</Tabs>
+
+## 3. Connect your codebase
+
+Connect GitHub or GitLab so Sonarly can analyze your code and create pull requests.
+
+<Tabs>
+  <Tab title="GitHub">
+    1. Click **Connect GitHub**
+    2. Install the Sonarly GitHub App
+    3. Select which repositories to give access to
+  </Tab>
+  <Tab title="GitLab">
+    1. Click **Connect GitLab**
+    2. Authorize via OAuth
+    3. Select your repositories
+
+    Self-hosted GitLab instances are also supported.
+  </Tab>
+</Tabs>
+
+## 4. Connect Slack (optional)
+
+Get notified in Slack when new issues are found and fixes are ready.
+
+1. Go to **Settings** → **Slack**
+2. Click **Connect Slack** and authorize
+3. Select which channel receives notifications
+4. Configure severity preferences (e.g. only notify on critical issues)
+
+## 5. You're all set
+
+New alerts from your connected tools are now automatically:
+
+1. **Analyzed** — AI classifies severity and generates a clear title and description
+2. **Deduplicated** — Similar issues are grouped to reduce noise
+3. **Investigated** — Claude Code explores your codebase to find the root cause
+4. **Fixed** — A pull request is created with the fix and a detailed explanation
+5. **Notified** — You get a Slack message (or email) with the summary and PR link
+
+Visit your **Issues** page to see results as they come in.

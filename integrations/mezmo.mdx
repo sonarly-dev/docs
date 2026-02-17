@@ -1,0 +1,45 @@
+---
+title: "Mezmo"
+description: "Connect Mezmo (LogDNA) for log queries during incident investigation"
+icon: "scroll"
+---
+
+Sonarly connects to Mezmo (formerly LogDNA) to query your logs during incident investigation and receive alert webhooks.
+
+## Connect Mezmo
+
+<Steps>
+  <Step title="Get your API key">
+    In Mezmo, go to **Settings** → **Organization** → **API Keys**. Copy your Service Key.
+  </Step>
+  <Step title="Enter credentials">
+    On the Sonarly settings page, enter your Mezmo API key.
+  </Step>
+  <Step title="Validation">
+    Sonarly validates access by querying your logs.
+  </Step>
+</Steps>
+
+## Observability tools available to the AI
+
+| Tool | What it does |
+|------|-------------|
+| **Search logs** | Search logs by query, timeframe, and level |
+| **List views** | List saved views and alerts |
+| **Logs by host** | Get logs filtered by specific host |
+| **Logs around time** | Get logs in a window around a specific timestamp |
+| **Log stats** | Get log volume statistics |
+
+<Info>
+Your Mezmo API key never leaves the Sonarly backend. All log queries go through a server-side proxy.
+</Info>
+
+## Webhook alerts
+
+Mezmo can send alert webhooks to Sonarly when log patterns match your alert rules:
+
+```
+https://sonarly.dev/api/webhooks/mezmo?tenant_id=YOUR_TENANT_ID
+```
+
+Configure this URL as a webhook destination in your Mezmo alert settings.

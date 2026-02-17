@@ -1,0 +1,62 @@
+---
+title: "Datadog"
+description: "Connect Datadog for automatic incident analysis with log queries"
+icon: "dog"
+---
+
+Sonarly connects to Datadog using API keys to receive alert webhooks and query your logs, traces, and metrics during incident investigation.
+
+## Connect Datadog
+
+<Steps>
+  <Step title="Get your API keys">
+    In Datadog, go to **Organization Settings** → **API Keys** and **Application Keys**. You need both an API Key and an Application Key.
+  </Step>
+  <Step title="Enter credentials">
+    On the Sonarly onboarding page, enter your API Key, Application Key, and Datadog site (e.g. `us5.datadoghq.com`).
+  </Step>
+  <Step title="Validation">
+    Sonarly validates your credentials and tests access to logs, webhooks, and events APIs.
+  </Step>
+  <Step title="Auto-setup">
+    A webhook is automatically created in your Datadog account pointing to Sonarly. No manual configuration needed.
+  </Step>
+</Steps>
+
+## How it works
+
+When a Datadog alert fires:
+
+1. Datadog sends a webhook to Sonarly with alert details
+2. Sonarly deduplicates against recent alerts (5-minute window)
+3. Claude Code investigates the incident:
+   - Queries your **Datadog logs** around the alert time
+   - Checks **monitors** and **metrics** for anomalies
+   - Searches **APM traces** for errors
+   - Analyzes your **codebase** for the root cause
+4. A detailed incident report is generated with timeline, root cause, and suggested fix
+5. If a code fix is identified, a PR is created automatically
+
+## Observability tools available to the AI
+
+During investigation, the AI agent has access to your Datadog data via secure server-side tools:
+
+| Tool | What it does |
+|------|-------------|
+| **Logs search** | Search logs by query, timeframe, and service |
+| **Monitors** | List active monitors and their status |
+| **APM traces** | Search spans by service, duration, and status |
+| **Hosts** | List infrastructure hosts |
+| **Metrics** | Query timeseries metrics |
+| **Dashboards** | List and inspect dashboards |
+
+<Info>
+Your API keys never leave the Sonarly backend. The AI agent queries Datadog through Sonarly's server-side proxy — keys are never exposed in sandboxes or logs.
+</Info>
+
+## Permissions needed
+
+| Key | Required permissions |
+|-----|---------------------|
+| **API Key** | Standard Datadog API key |
+| **Application Key** | Needs access to: Logs, Monitors, APM, Webhooks |

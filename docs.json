@@ -1,11 +1,11 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "theme": "mint",
+  "theme": "maple",
   "name": "Sonarly",
   "colors": {
-    "primary": "#00EEC6",
-    "light": "#00E8C1",
-    "dark": "#00C9A7"
+    "primary": "#000000",
+    "light": "#5E5E5E",
+    "dark": "#000000"
   },
   "favicon": "/favicon.png",
   "logo": {
@@ -15,19 +15,71 @@
   "redirects": [
     {
       "source": "/",
-      "destination": "/quickstart"
+      "destination": "/introduction"
     }
   ],
-    "navigation": {
-      "groups": [
-        {
-          "group": "Overview",
-          "pages": [
-            "quickstart"
-          ]
-        }
-      ]
-    },
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Getting Started",
+            "pages": ["introduction", "quickstart"]
+          },
+          {
+            "group": "Error Tracking",
+            "pages": ["integrations/sentry"]
+          },
+          {
+            "group": "Observability",
+            "pages": [
+              "integrations/datadog",
+              "integrations/grafana",
+              "integrations/signoz",
+              "integrations/cloudwatch",
+              "integrations/mezmo"
+            ]
+          },
+          {
+            "group": "Incident Management",
+            "pages": [
+              "integrations/pagerduty",
+              "integrations/incidentio",
+              "integrations/opsgenie"
+            ]
+          },
+          {
+            "group": "Code & PRs",
+            "pages": [
+              "integrations/github",
+              "integrations/gitlab"
+            ]
+          },
+          {
+            "group": "Notifications",
+            "pages": [
+              "integrations/slack",
+              "integrations/discord"
+            ]
+          },
+          {
+            "group": "Features",
+            "pages": [
+              "features/ai-analysis",
+              "features/deduplication",
+              "features/pr-generation",
+              "features/severity"
+            ]
+          },
+          {
+            "group": "Platform",
+            "pages": ["security", "faq"]
+          }
+        ]
+      }
+    ]
+  },
   "navbar": {
     "links": [
       {
@@ -37,25 +89,22 @@
     ],
     "primary": {
       "type": "button",
-      "label": "Start fixing bugs",
+      "label": "Get started",
       "href": "https://sonarly.dev"
     }
   },
-    "contextual": {
+  "contextual": {
     "options": [
       "copy",
       "view",
       "chatgpt",
       "claude",
-      "perplexity",
-      "mcp",
-      "cursor",
-      "vscode"
+      "cursor"
     ]
   },
   "footer": {
     "socials": {
-      "github": "https://github.com/alex78420/sonarly-tracker",
+      "github": "https://github.com/sonarly-dev",
       "x": "https://x.com/SonarlyDev",
       "discord": "https://discord.gg/9XDVzde4G4"
     }

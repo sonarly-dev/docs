@@ -1,0 +1,50 @@
+---
+title: "Slack"
+description: "Get notified in Slack when issues are found and fixes are ready"
+icon: "slack"
+---
+
+Sonarly sends rich Slack notifications when new bugs are found, incidents are investigated, and pull requests are created.
+
+## Connect Slack
+
+<Steps>
+  <Step title="Authorize">
+    Go to **Settings** → **Slack** and click **Connect Slack**. Authorize the Sonarly bot in your workspace.
+  </Step>
+  <Step title="Select a channel">
+    Choose which Slack channel receives notifications.
+  </Step>
+  <Step title="Configure preferences">
+    Set severity preferences — for example, only get notified for critical and medium issues.
+  </Step>
+</Steps>
+
+## Notification format
+
+Sonarly sends rich Block Kit messages with:
+
+- **Severity badge** — Visual indicator (critical, medium, low)
+- **Issue title** — Clear, AI-generated summary
+- **Root cause** — What went wrong
+- **Fix summary** — What the PR does
+- **Action buttons** — View in Sonarly, view PR on GitHub/GitLab
+
+## Slack bot agent
+
+You can also **@mention the Sonarly bot** in any Slack channel to ask it questions. The bot launches Claude Code with your conversation context and responds directly in the thread.
+
+The bot:
+- Reads up to 10 recent messages in the thread for context
+- Runs Claude Code with access to your codebase and observability tools
+- Streams live progress updates in the Slack thread
+- Returns findings directly in the conversation
+
+## Permissions
+
+| Scope | Purpose |
+|-------|---------|
+| `chat:write` | Send notifications to your channel |
+| `channels:read` | List channels for selection |
+| `groups:read` | List private channels for selection |
+| `app_mentions:read` | Respond when @mentioned |

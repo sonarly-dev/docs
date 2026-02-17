@@ -1,0 +1,58 @@
+---
+title: "Introduction"
+description: "AI engineer for production alerts — from alert to fix in minutes"
+---
+
+Sonarly is an AI-powered platform that transforms noisy production alerts into clear, actionable bug reports with automatic PR fixes.
+
+Connect your existing tools — Sentry, Datadog, Grafana, PagerDuty, and more — and Sonarly's AI engineer will triage every alert, find the root cause in your code, and open a pull request with the fix.
+
+## How it works
+
+<Steps>
+  <Step title="Connect your tools">
+    Link your error tracking (Sentry), observability (Datadog, Grafana, SigNoz), and incident management (PagerDuty, Incident.io, Opsgenie) platforms. Takes 2 minutes, no SDK or code changes.
+  </Step>
+  <Step title="Connect your codebase">
+    Install the Sonarly GitHub App or connect GitLab so the AI can access your repositories and create pull requests.
+  </Step>
+  <Step title="AI triages every alert">
+    Each incoming alert is automatically analyzed: severity classification, root cause identification, git blame, and deduplication against known issues.
+  </Step>
+  <Step title="Get a PR with the fix">
+    For each new issue, Sonarly opens a pull request with the fix, a detailed root cause explanation, and the commit that introduced the bug. Review, merge, and move on.
+  </Step>
+</Steps>
+
+## What Sonarly connects to
+
+<CardGroup cols={3}>
+  <Card title="Error Tracking" icon="bug">
+    Sentry (OAuth + webhooks)
+  </Card>
+  <Card title="Observability" icon="chart-line">
+    Datadog, Grafana, SigNoz, CloudWatch
+  </Card>
+  <Card title="Incidents" icon="bell">
+    PagerDuty, Incident.io, Opsgenie
+  </Card>
+  <Card title="Code" icon="code-branch">
+    GitHub, GitLab (including self-hosted)
+  </Card>
+  <Card title="Notifications" icon="message">
+    Slack, Discord
+  </Card>
+  <Card title="Security" icon="shield-halved">
+    SOC 2 Type 2 certified
+  </Card>
+</CardGroup>
+
+## Key capabilities
+
+- **Automatic triage** — Every alert is classified as critical, medium, or low based on user impact
+- **Root cause analysis** — AI explores your codebase to find exactly what went wrong and who introduced it
+- **Smart deduplication** — Similar alerts are grouped automatically, reducing noise by up to 80%
+- **PR generation** — Pull requests with fixes, root cause explanation, and git blame
+- **Observability queries** — AI queries your logs (Datadog, Grafana, CloudWatch) during incident investigation
+- **Slack notifications** — Rich notifications with severity, root cause, and action buttons
+- **Live streaming** — Watch the AI think and work in real-time from your dashboard

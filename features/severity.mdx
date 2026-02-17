@@ -1,0 +1,46 @@
+---
+title: "Severity Classification"
+description: "How Sonarly classifies issue severity by user impact"
+icon: "gauge-high"
+---
+
+Every issue analyzed by Sonarly is classified into one of three severity levels based on user impact.
+
+## Severity levels
+
+| Severity | User impact | Examples |
+|----------|------------|---------|
+| **Critical** | Users cannot complete their task | Login fails, payment broken, data loss, app crash |
+| **Medium** | Degraded experience but task is possible | Slow loading, UI glitches, intermittent errors |
+| **Low** | Users unlikely to notice | Console warnings, minor cosmetic issues, internal logs |
+
+## How severity is determined
+
+Severity is classified in two stages:
+
+1. **Initial triage** (Gemini) — Fast classification based on error type, message, and context. Available within seconds.
+2. **Deep analysis** (Claude Code) — Refined severity based on actual code analysis, user impact assessment, and root cause understanding. May upgrade or downgrade the initial severity.
+
+The final severity from Claude Code takes precedence.
+
+## Severity-based actions
+
+You can configure what happens at each severity level:
+
+### PR creation
+
+| Setting | Description |
+|---------|-------------|
+| **Create PR on critical** | Always create a fix PR for critical issues |
+| **Create PR on medium** | Create PR for medium issues |
+| **Create PR on low** | Only on manual trigger |
+
+### Notifications
+
+| Setting | Description |
+|---------|-------------|
+| **Alert on critical** | Send Slack/email notification |
+| **Alert on medium** | Send notification |
+| **Alert on low** | Silent (visible in dashboard only) |
+
+Configure these in **Settings** → **Notifications**.

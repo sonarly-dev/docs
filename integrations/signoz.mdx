@@ -1,0 +1,46 @@
+---
+title: "SigNoz"
+description: "Connect SigNoz for alert-driven incident analysis with logs and traces"
+icon: "signal"
+---
+
+Sonarly connects to SigNoz using an API key to receive alerts and query your logs, traces, and service metrics during investigation.
+
+## Connect SigNoz
+
+<Steps>
+  <Step title="Get your API key">
+    In SigNoz, go to **Settings** → **General** → copy your API key. An Admin role is recommended for automatic webhook setup.
+  </Step>
+  <Step title="Enter credentials">
+    On the Sonarly onboarding page, enter your SigNoz URL and API key.
+  </Step>
+  <Step title="Validation">
+    Sonarly validates access by checking the health endpoint, listing services, and running a test log query.
+  </Step>
+  <Step title="Auto-setup">
+    A **Sonarly** webhook notification channel is automatically created in SigNoz. If your API key has Viewer permissions only, you'll get manual setup instructions instead.
+  </Step>
+</Steps>
+
+## Observability tools available to the AI
+
+| Tool | What it does |
+|------|-------------|
+| **List services** | Discover services reporting to SigNoz |
+| **Search logs** | Query logs via the builder API |
+| **Search traces** | Search spans by service, duration, status |
+| **Service overview** | Error rate, latency, and throughput for a service |
+| **List alerts** | List alert rules and their state |
+| **Alert history** | Firing history for a specific alert rule |
+
+<Info>
+Your API key never leaves the Sonarly backend. All SigNoz queries go through a server-side proxy.
+</Info>
+
+## Permissions needed
+
+| Role | What it enables |
+|------|----------------|
+| **Admin** (recommended) | Full access + automatic webhook setup |
+| **Viewer** | Read-only access, manual webhook setup required |

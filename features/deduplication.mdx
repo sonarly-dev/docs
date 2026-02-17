@@ -1,0 +1,53 @@
+---
+title: "Deduplication"
+description: "How Sonarly groups similar issues to reduce alert noise"
+icon: "layer-group"
+---
+
+Sonarly uses multi-tier deduplication to group similar errors and incidents, reducing noise by up to 80%. Instead of seeing 50 alerts for the same issue, you see one issue with an occurrence count.
+
+## How it works
+
+### Error deduplication (Sentry)
+
+Sentry errors go through two dedup stages:
+
+**Pre-analysis (fast, before Claude Code):**
+
+1. **Exact Sentry issue ID** — Same Sentry issue = same bug. Handled at database insert.
+2. **Exact error message match** — Normalized string comparison catches identical messages.
+3. **AI semantic match** — Gemini compares the new error against your 100 most recent issues, catching similar errors with different messages.
+
+**Post-analysis (after Claude Code):**
+
+4. **Exact title match** — If Claude Code generates the same title as an existing analyzed bug, it's a duplicate.
+5. **Root cause comparison** — Gemini compares root causes, suggested fixes, and severity between the new and existing bugs. Two different errors caused by the same root cause are grouped together.
+
+### Incident deduplication
+
+Incidents from webhooks (PagerDuty, Datadog, etc.) are deduplicated after analysis:
+
+1. **Correlation ID** — Each webhook source has a unique correlation ID (e.g. `pagerduty:{incident_id}`, `datadog:{alert_id}`). Duplicate webhooks within a 5-minute window are dropped.
+2. **Exact title match** — Post-analysis comparison of normalized titles.
+3. **AI semantic comparison** — Gemini compares analysis results (title, root cause, summary) against existing incident groups.
+
+## What happens to duplicates
+
+When a duplicate is detected:
+
+- The **parent issue's occurrence count** increases
+- The duplicate's data is merged into the parent
+- **No new PR is created** — the existing fix covers this occurrence
+- **No new notification** — reduces Slack/email noise
+- The duplicate is still visible in the parent's history
+
+## Incident groups
+
+Unique incidents are stored as **incident groups** with:
+
+| Field | Description |
+|-------|-------------|
+| `occurrence_count` | How many times this incident occurred |
+| `first_seen` | When this incident was first detected |
+| `last_seen` | Most recent occurrence |
+| `pr_url` | Link to the fix PR (if created) |

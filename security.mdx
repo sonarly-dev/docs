@@ -1,0 +1,60 @@
+---
+title: "Security"
+description: "How Sonarly protects your code and data"
+icon: "shield-halved"
+---
+
+Sonarly is SOC 2 Type 2 certified. Security is built into every layer of the platform.
+
+## Code isolation
+
+- **Sandboxed execution** — All code analysis runs in isolated containers. Each tenant gets a dedicated sandbox.
+- **No persistent storage** — Sandboxes have a 24-hour TTL. Your source code is never stored permanently.
+- **API keys never in sandbox** — Observability tool credentials (Datadog, Grafana, etc.) stay on the Sonarly backend. The AI agent queries logs via a server-side proxy.
+
+## Encryption
+
+- **Tokens encrypted at rest** — All OAuth tokens and API keys are encrypted using Fernet (AES-128-CBC with HMAC-SHA256)
+- **TLS in transit** — All API communication uses HTTPS
+- **JWT authentication** — 15-minute access tokens + 30-day HTTP-only refresh cookies
+
+## Permissions model
+
+Sonarly follows the principle of least privilege:
+
+| Integration | Access level |
+|-------------|-------------|
+| **Sentry** | Read-only (`org:read`, `project:read`, `event:read`, `member:read`) |
+| **GitHub** | Contents read/write, PR write (scoped to selected repos) |
+| **GitLab** | OAuth with repo access (scoped to selected repos) |
+| **Slack** | `chat:write`, `channels:read`, `groups:read` |
+| **Datadog** | API key + app key (read access to logs, monitors, traces) |
+| **Grafana** | Service account token (Viewer role) |
+| **SigNoz** | API key (read access) |
+| **CloudWatch** | IAM credentials (read-only log access) |
+
+## Webhook verification
+
+All webhook endpoints verify signatures to prevent spoofing:
+
+| Platform | Method |
+|----------|--------|
+| Sentry | HMAC-SHA256 with client secret |
+| PagerDuty | HMAC-SHA256 (`X-PagerDuty-Signature`) |
+| Datadog | HMAC-SHA256 (`DD-WEBHOOK-SIGNATURE`) |
+| Incident.io | Standard Webhooks v1 |
+| Grafana | Bearer token |
+| Opsgenie | GenieKey API key |
+| SigNoz | Basic Auth |
+
+All signature comparisons use constant-time algorithms to prevent timing attacks.
+
+## Multi-tenancy
+
+Every database query is scoped to the authenticated tenant. Cross-tenant data access is impossible by design. Sessions are limited to 5 per user with automatic rotation.
+
+## Data retention
+
+- Imported errors and incidents are retained for the life of your account
+- Sandbox environments are cleaned up after 24 hours
+- You can request full data deletion at any time by contacting support

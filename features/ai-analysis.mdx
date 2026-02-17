@@ -1,0 +1,63 @@
+---
+title: "AI Analysis"
+description: "How Sonarly's AI investigates errors and incidents"
+icon: "brain"
+---
+
+Every alert that reaches Sonarly goes through a two-stage AI analysis pipeline: a fast initial triage, followed by a deep codebase investigation.
+
+## Stage 1: Fast triage (Gemini)
+
+When an alert arrives (from Sentry, Datadog, or any webhook), Gemini 2.5 Flash analyzes it in seconds:
+
+- **Title** — Generates a clear, human-readable title
+- **Description** — Explains the error in plain language
+- **Severity** — Classifies as critical, medium, or low based on user impact
+- **Deduplication** — Checks if this is a duplicate of an existing issue
+
+This gives you immediate visibility into what happened, even before the deep analysis starts.
+
+## Stage 2: Deep investigation (Claude Code)
+
+For each new unique issue, Claude Code runs in an isolated sandbox:
+
+1. **Clones your repository** into a secure environment
+2. **Explores the codebase** — reads relevant files, follows imports, understands context
+3. **Finds the root cause** — identifies the exact code that causes the issue
+4. **Runs git blame** — finds who introduced the bug, when, and in which commit
+5. **Generates a fix** — writes the code change that resolves the issue
+6. **Creates a PR** — pushes to a new branch and opens a pull request
+
+### For incidents (Datadog, Grafana, PagerDuty, etc.)
+
+Claude Code also has access to your observability tools via MCP:
+
+- Queries **logs** around the incident time
+- Checks **metrics** for anomalies
+- Searches **traces** for errors
+- Correlates log patterns with code changes
+
+## Live streaming
+
+You can watch Claude Code think and work in real-time from the Sonarly dashboard. The agent streams its reasoning, tool calls, and findings as they happen.
+
+## Analysis output
+
+Every analysis produces a structured report:
+
+| Field | Description |
+|-------|-------------|
+| **Title** | Clear, concise issue title |
+| **Severity** | Critical, medium, or low |
+| **Summary** | 1-2 sentence overview |
+| **User impact** | Who is affected and how |
+| **Root cause** | Detailed explanation with blame info |
+| **Suggested fix** | What the fix does and why it works |
+| **PR link** | Direct link to the pull request |
+
+## Execution environment
+
+- **Isolated sandboxes** — Each analysis runs in its own container
+- **Parallel execution** — Multiple issues analyzed simultaneously via git worktrees
+- **API proxied** — Anthropic API calls go through Cloudflare AI Gateway
+- **No persistent storage** — Sandboxes have 24h TTL, source code is never stored permanently

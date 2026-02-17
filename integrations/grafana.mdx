@@ -1,0 +1,64 @@
+---
+title: "Grafana"
+description: "Connect Grafana for alert-driven incident analysis with PromQL and Loki"
+icon: "chart-area"
+---
+
+Sonarly connects to Grafana using a service account token to receive alerts and query your Prometheus metrics and Loki logs during investigation.
+
+## Connect Grafana
+
+<Steps>
+  <Step title="Create a service account">
+    In Grafana, go to **Administration** → **Service accounts** → **Add service account**. Give it the **Viewer** role and the **Data sources: Explorer** fixed role.
+  </Step>
+  <Step title="Generate a token">
+    Create a token for the service account and copy it.
+  </Step>
+  <Step title="Enter credentials">
+    On the Sonarly onboarding page, enter your Grafana URL and the service account token.
+  </Step>
+  <Step title="Auto-setup">
+    Sonarly validates access, discovers your datasources, and auto-creates a **Sonarly** webhook contact point in Grafana. A route is added to your notification policy with `continue: true` so your existing alert routing is not affected.
+  </Step>
+</Steps>
+
+## How it works
+
+When a Grafana alert fires:
+
+1. Grafana sends the alert to the Sonarly contact point
+2. Sonarly deduplicates against recent alerts (5-minute window)
+3. Claude Code investigates using your Grafana data:
+   - Queries **Prometheus** metrics via PromQL
+   - Searches **Loki logs** with LogQL
+   - Inspects **dashboards** and panel queries
+   - Checks **annotations** for recent deploys
+   - Analyzes your **codebase** for the root cause
+4. An incident report is generated with root cause and fix
+
+## Observability tools available to the AI
+
+| Tool | What it does |
+|------|-------------|
+| **Prometheus query** | Run PromQL queries against your metrics |
+| **Loki logs** | Search logs with LogQL |
+| **Loki stats** | Get log volume statistics |
+| **Loki patterns** | Discover log patterns |
+| **Dashboard search** | Find relevant dashboards |
+| **Dashboard details** | Inspect panels and their queries |
+| **Panel queries** | Extract exact queries from dashboard panels |
+| **Annotations** | Check deploy markers and alert state changes |
+| **Alert rules** | List active alert rules and their states |
+| **Datasources** | Discover available datasources |
+
+<Info>
+Your service account token never leaves the Sonarly backend. All Grafana queries go through a server-side proxy.
+</Info>
+
+## Permissions needed
+
+| Role | Purpose |
+|------|---------|
+| **Viewer** | Read access to dashboards, datasources, alerts |
+| **Data sources: Explorer** | Query Prometheus and Loki via datasource proxy |

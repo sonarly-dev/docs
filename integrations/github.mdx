@@ -1,0 +1,58 @@
+---
+title: "GitHub"
+description: "Connect GitHub for codebase analysis and automatic PR creation"
+icon: "github"
+---
+
+Sonarly uses a GitHub App to access your repositories, analyze your code, and create pull requests with fixes.
+
+## Connect GitHub
+
+<Steps>
+  <Step title="Install the GitHub App">
+    Click **Connect GitHub** from the onboarding page or Settings. You'll be redirected to GitHub to install the Sonarly app.
+  </Step>
+  <Step title="Select repositories">
+    Choose which repositories Sonarly can access. You can grant access to all repos or select specific ones.
+  </Step>
+  <Step title="Done">
+    Sonarly can now clone your repos, analyze code, and create PRs. No further configuration needed.
+  </Step>
+</Steps>
+
+## What Sonarly does with GitHub access
+
+### Code analysis
+When analyzing a bug or incident, Claude Code:
+1. Clones your repository into an isolated sandbox
+2. Explores the codebase to find the root cause
+3. Runs `git blame` to identify who introduced the bug and when
+4. Generates a fix
+
+### Pull request creation
+For each identified fix, Sonarly creates a PR with:
+- **Title** — Clear description of the fix
+- **Severity badge** — Critical, medium, or low
+- **Root cause analysis** — What went wrong and why
+- **Git blame** — Who introduced the bug and in which commit
+- **Fix explanation** — What the code changes do and why they solve the problem
+
+### Parallel execution
+Multiple bugs can be analyzed simultaneously. Each analysis runs in its own git worktree, so there are no conflicts between concurrent runs.
+
+## Permissions
+
+The Sonarly GitHub App requests:
+
+| Permission | Access | Purpose |
+|-----------|--------|---------|
+| **Contents** | Read & Write | Clone repos, create branches, push commits |
+| **Pull requests** | Write | Create PRs with fixes |
+| **Metadata** | Read | List repos and branches |
+
+## Security
+
+- Repository access is scoped to only the repos you select
+- Code is cloned into isolated sandboxes with 24h TTL
+- Sonarly never stores your source code permanently
+- Installation tokens are short-lived and scoped per-repository

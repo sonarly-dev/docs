@@ -1,0 +1,46 @@
+---
+title: "PR Generation"
+description: "How Sonarly creates pull requests with fixes automatically"
+icon: "code-pull-request"
+---
+
+When Sonarly's AI identifies a fix for a bug or incident, it automatically creates a pull request on GitHub or GitLab.
+
+## What's in a PR
+
+Every Sonarly PR includes:
+
+- **Title** — Clear description of the fix (e.g. "Fix null pointer in payment handler")
+- **Severity** — Critical, medium, or low badge
+- **Root cause** — What caused the issue and which commit introduced it
+- **Git blame** — Author, date, and commit SHA of the introducing change
+- **Fix explanation** — What the code changes do and why they solve the problem
+- **Testing suggestions** — How to verify the fix works
+
+## PR creation flow
+
+1. Claude Code generates the fix in an isolated sandbox
+2. Changes are committed to a new branch (e.g. `fix/bug-123-null-pointer`)
+3. The branch is pushed to your repository
+4. A PR (GitHub) or MR (GitLab) is created with the full report body
+5. The PR link is saved to the issue in Sonarly and included in Slack notifications
+
+## Severity-based PR policies
+
+You can configure when PRs are created based on severity:
+
+| Severity | Default behavior |
+|----------|-----------------|
+| **Critical** | Always create PR |
+| **Medium** | Always create PR |
+| **Low** | Manual trigger only |
+
+Configure these preferences in **Settings** → **Notifications**.
+
+## Parallel execution
+
+Multiple PRs can be created simultaneously. Each analysis runs in its own git worktree, so there's no interference between concurrent runs. Different branches, different commits, no conflicts.
+
+## Review and merge
+
+Sonarly **never auto-merges** pull requests. Every PR is created for your review. You control when and whether to merge.

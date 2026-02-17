@@ -1,0 +1,33 @@
+---
+title: "Discord"
+description: "Monitor Discord forum channels for user-reported bugs"
+icon: "discord"
+---
+
+Sonarly monitors Discord forum channels (like `#bug-reports`) for new posts and automatically analyzes them as incidents.
+
+## Connect Discord
+
+<Steps>
+  <Step title="Authorize">
+    Click **Connect Discord** from the onboarding page. Select your Discord server and authorize the Sonarly bot.
+  </Step>
+  <Step title="Select a forum channel">
+    Choose which forum channel to monitor (e.g. `#bug-reports`). New forum posts in this channel will trigger automatic analysis.
+  </Step>
+  <Step title="Done">
+    New forum posts are now automatically forwarded to Sonarly's incident analysis pipeline.
+  </Step>
+</Steps>
+
+## How it works
+
+1. A user creates a new post in your monitored forum channel
+2. The Sonarly Discord bot detects the new thread via Discord Gateway
+3. The post content is forwarded to Sonarly as an incident
+4. Claude Code investigates: searches your codebase, queries logs from connected observability tools
+5. An incident report is generated with root cause and suggested fix
+
+## Use case
+
+This is especially useful for teams whose users report bugs in Discord communities. Instead of manually triaging each forum post, Sonarly automatically investigates and creates a fix.

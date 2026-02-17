@@ -1,0 +1,77 @@
+---
+title: "Sentry"
+description: "Connect Sentry to automatically import, analyze, and fix errors"
+icon: "bug"
+---
+
+Sonarly connects to Sentry via OAuth to import your unresolved issues, analyze them with AI, deduplicate similar errors, and create pull requests with fixes.
+
+## Connect Sentry
+
+<Steps>
+  <Step title="Start connection">
+    Click **Connect Sentry** from the onboarding page or Settings.
+  </Step>
+  <Step title="Authorize">
+    You'll be redirected to Sentry. Authorize Sonarly with read-only permissions.
+  </Step>
+  <Step title="Select a project">
+    Choose which Sentry project to monitor. Sonarly will import unresolved issues from this project.
+  </Step>
+  <Step title="Start import">
+    Click **Start Import**. Sonarly fetches your issues and begins AI analysis. You can watch progress in real-time.
+  </Step>
+</Steps>
+
+## How it works
+
+### Bulk import
+
+When you first connect, Sonarly imports your existing unresolved issues:
+
+1. Fetches issues from the Sentry API
+2. AI analyzes each issue — generates a clear title, description, and severity
+3. Deduplicates similar errors (see [Deduplication](/features/deduplication))
+4. For each unique issue, Claude Code analyzes your codebase to find the root cause and create a fix PR
+
+### Real-time webhooks
+
+After the initial import, Sonarly receives new issues in real-time via Sentry webhooks:
+
+1. Sentry sends an `issue.created` webhook when a new issue appears
+2. Sonarly verifies the HMAC-SHA256 signature
+3. Full event data is fetched (stacktrace, breadcrumbs, tags, contexts)
+4. AI analysis + deduplication runs automatically
+5. If the issue is new, Claude Code investigates and creates a fix (PR creation depends on your severity preferences)
+
+### What you see
+
+For each issue, your Sonarly dashboard shows:
+
+- **Severity** — Critical, medium, or low based on user impact
+- **AI title & description** — Clear, human-readable summary
+- **Root cause** — What went wrong and which commit introduced it
+- **Suggested fix** — Explanation of the fix with a link to the PR
+- **Occurrence count** — How many times this error has occurred
+- **Live agent output** — Watch Claude Code think and work in real-time
+
+## Permissions
+
+Sonarly requests **read-only** access to your Sentry organization:
+
+| Scope | Purpose |
+|-------|---------|
+| `org:read` | List your Sentry organizations |
+| `project:read` | List projects to select from |
+| `event:read` | Fetch issue details, stacktraces, and events |
+| `member:read` | Resolve organization membership |
+
+Sonarly **never modifies** your Sentry data. We don't resolve issues, change assignments, or update anything in Sentry.
+
+## Environment filtering
+
+You can filter which Sentry environments are monitored. Go to your Sentry integration settings and select the environments you care about (e.g. `production`, `staging`). Issues from other environments are automatically ignored.
+
+## Token management
+
+Sonarly uses Sentry's JWT bearer grant for token refresh. Tokens are encrypted at rest and refreshed automatically before expiry. You can disconnect Sentry at any time from Settings.

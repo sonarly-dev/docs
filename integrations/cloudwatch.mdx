@@ -1,0 +1,55 @@
+---
+title: "CloudWatch"
+description: "Connect AWS CloudWatch for log queries during incident investigation"
+icon: "cloud"
+---
+
+Sonarly connects to AWS CloudWatch to query your logs during incident investigation. The AI agent can search, sample, and analyze log groups to find root causes.
+
+## Connect CloudWatch
+
+<Steps>
+  <Step title="Create IAM credentials">
+    Create an IAM user or role with read-only access to CloudWatch Logs. Required permissions: `logs:DescribeLogGroups`, `logs:GetLogEvents`, `logs:FilterLogEvents`, `logs:GetLogGroupFields`.
+  </Step>
+  <Step title="Enter credentials">
+    On the Sonarly settings page, enter your AWS Access Key, Secret Key, and region.
+  </Step>
+  <Step title="Validation">
+    Sonarly validates access by listing your log groups.
+  </Step>
+</Steps>
+
+## Observability tools available to the AI
+
+| Tool | What it does |
+|------|-------------|
+| **List log groups** | Discover available CloudWatch log groups |
+| **Log statistics** | Get volume and field statistics for a log group |
+| **Sample logs** | Fetch recent log entries from a group |
+| **Search logs** | Filter logs by pattern, timeframe, and fields |
+| **Logs around time** | Get logs in a window around a specific timestamp |
+
+<Info>
+Your AWS credentials never leave the Sonarly backend. All CloudWatch queries go through a server-side proxy.
+</Info>
+
+## IAM policy example
+
+```json
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Action": [
+        "logs:DescribeLogGroups",
+        "logs:GetLogEvents",
+        "logs:FilterLogEvents",
+        "logs:GetLogGroupFields"
+      ],
+      "Resource": "*"
+    }
+  ]
+}
+```
