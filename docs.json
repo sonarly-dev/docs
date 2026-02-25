@@ -36,17 +36,10 @@
             "pages": [
               "integrations/datadog",
               "integrations/grafana",
+              "integrations/gcp",
               "integrations/signoz",
               "integrations/cloudwatch",
               "integrations/mezmo"
-            ]
-          },
-          {
-            "group": "Incident Management",
-            "pages": [
-              "integrations/pagerduty",
-              "integrations/incidentio",
-              "integrations/opsgenie"
             ]
           },
           {

@@ -1,10 +1,10 @@
 ---
 title: "SigNoz"
-description: "Connect SigNoz for alert-driven incident analysis with logs and traces"
+description: "Connect SigNoz for alert-driven incident analysis with logs, traces, and metrics"
 icon: "signal"
 ---
 
-Sonarly connects to SigNoz using an API key to receive alerts and query your logs, traces, and service metrics during investigation.
+Sonarly connects to SigNoz using an API key to receive alerts and query your logs, traces, metrics, and service data during investigation.
 
 ## Connect SigNoz
 
@@ -27,12 +27,14 @@ Sonarly connects to SigNoz using an API key to receive alerts and query your log
 
 | Tool | What it does |
 |------|-------------|
-| **List services** | Discover services reporting to SigNoz |
-| **Search logs** | Query logs via the builder API |
-| **Search traces** | Search spans by service, duration, status |
-| **Service overview** | Error rate, latency, and throughput for a service |
-| **List alerts** | List alert rules and their state |
-| **Alert history** | Firing history for a specific alert rule |
+| **signoz_search_logs** | Query logs via builder API with filters, patterns view (drain3 clustering), and absolute timestamps |
+| **signoz_aggregate_logs** | Aggregate logs with builder API operators (count, avg, p99, rate, etc.) with groupBy |
+| **signoz_search_traces** | Search spans by service, operation, duration, status, HTTP method |
+| **signoz_query_metrics** | Run PromQL queries for OpenTelemetry metrics |
+| **signoz_list_services** | Discover services reporting to SigNoz |
+| **signoz_get_service_overview** | Error rate, latency (p50/p90/p99), and throughput for a service |
+| **signoz_list_alerts** | List alert rules and their state |
+| **signoz_get_alert_history** | Firing history for a specific alert rule |
 
 <Info>
 Your API key never leaves the Sonarly backend. All SigNoz queries go through a server-side proxy.

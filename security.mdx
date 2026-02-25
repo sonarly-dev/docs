@@ -30,6 +30,7 @@ Sonarly follows the principle of least privilege:
 | **Slack** | `chat:write`, `channels:read`, `groups:read` |
 | **Datadog** | API key + app key (read access to logs, monitors, traces) |
 | **Grafana** | Service account token (Viewer role) |
+| **GCP** | Service account key (read-only: logs, metrics, traces, alerts, SLOs) |
 | **SigNoz** | API key (read access) |
 | **CloudWatch** | IAM credentials (read-only log access) |
 
@@ -40,12 +41,10 @@ All webhook endpoints verify signatures to prevent spoofing:
 | Platform | Method |
 |----------|--------|
 | Sentry | HMAC-SHA256 with client secret |
-| PagerDuty | HMAC-SHA256 (`X-PagerDuty-Signature`) |
 | Datadog | HMAC-SHA256 (`DD-WEBHOOK-SIGNATURE`) |
-| Incident.io | Standard Webhooks v1 |
 | Grafana | Bearer token |
-| Opsgenie | GenieKey API key |
 | SigNoz | Basic Auth |
+| Mezmo | Webhook URL token |
 
 All signature comparisons use constant-time algorithms to prevent timing attacks.
 

@@ -24,11 +24,12 @@ Sonarly connects to Mezmo (formerly LogDNA) to query your logs during incident i
 
 | Tool | What it does |
 |------|-------------|
-| **Search logs** | Search logs by query, timeframe, and level |
-| **List views** | List saved views and alerts |
-| **Logs by host** | Get logs filtered by specific host |
-| **Logs around time** | Get logs in a window around a specific timestamp |
-| **Log stats** | Get log volume statistics |
+| **mezmo_search_logs** | Search logs by query, timeframe, level, with patterns view (drain3 clustering) |
+| **mezmo_aggregate_logs** | Aggregate log counts grouped by level, host, or app |
+| **mezmo_list_views** | List saved views and alerts |
+| **mezmo_get_logs_by_host** | Get logs filtered by specific host |
+| **mezmo_get_logs_around_time** | Get logs in a window around a specific timestamp |
+| **mezmo_get_log_stats** | Get log volume statistics |
 
 <Info>
 Your Mezmo API key never leaves the Sonarly backend. All log queries go through a server-side proxy.

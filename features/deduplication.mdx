@@ -25,9 +25,9 @@ Sentry errors go through two dedup stages:
 
 ### Incident deduplication
 
-Incidents from webhooks (PagerDuty, Datadog, etc.) are deduplicated after analysis:
+Incidents from webhooks (Datadog, Grafana, SigNoz, etc.) are deduplicated after analysis:
 
-1. **Correlation ID** — Each webhook source has a unique correlation ID (e.g. `pagerduty:{incident_id}`, `datadog:{alert_id}`). Duplicate webhooks within a 5-minute window are dropped.
+1. **Correlation ID** — Each webhook source has a unique correlation ID (e.g. `datadog:{alert_id}`, `grafana:{fingerprint}`). Duplicate webhooks within a 15-minute window are dropped.
 2. **Exact title match** — Post-analysis comparison of normalized titles.
 3. **AI semantic comparison** — Gemini compares analysis results (title, root cause, summary) against existing incident groups.
 

@@ -1,0 +1,76 @@
+---
+title: "GCP (Google Cloud)"
+description: "Connect Google Cloud Platform for log, metric, trace, and alert analysis"
+icon: "cloud"
+---
+
+Sonarly connects to Google Cloud Platform using a service account key to query Cloud Logging, Cloud Monitoring, Cloud Trace, Alert Policies, and SLOs during incident investigation.
+
+## Connect GCP
+
+<Steps>
+  <Step title="Enter your Project ID">
+    On the Sonarly onboarding page, enter your GCP Project ID. You can find it in the [Google Cloud Console](https://console.cloud.google.com).
+  </Step>
+  <Step title="Create a read-only service account">
+    Run the provided gcloud commands to create a service account with minimal read-only permissions:
+
+    ```bash
+    # 1. Create service account
+    gcloud iam service-accounts create sonarly-agent \
+      --display-name="Sonarly Agent (read-only)" \
+      --project=YOUR_PROJECT_ID
+
+    # 2. Create custom role with minimal permissions
+    gcloud iam roles create sonarly_readonly \
+      --project=YOUR_PROJECT_ID \
+      --title="Sonarly Read-Only" \
+      --permissions="logging.logEntries.list,logging.logs.list,monitoring.timeSeries.list,monitoring.alertPolicies.list,monitoring.services.list,monitoring.serviceLevelObjectives.list,cloudtrace.traces.list,cloudtrace.traces.get"
+
+    # 3. Bind role to service account
+    gcloud projects add-iam-policy-binding YOUR_PROJECT_ID \
+      --member="serviceAccount:sonarly-agent@YOUR_PROJECT_ID.iam.gserviceaccount.com" \
+      --role="projects/YOUR_PROJECT_ID/roles/sonarly_readonly"
+
+    # 4. Create JSON key
+    gcloud iam service-accounts keys create sonarly-key.json \
+      --iam-account=sonarly-agent@YOUR_PROJECT_ID.iam.gserviceaccount.com
+    ```
+  </Step>
+  <Step title="Paste the JSON key">
+    Open the downloaded `sonarly-key.json` file and paste its contents into the Sonarly onboarding form.
+  </Step>
+  <Step title="Test connection">
+    Sonarly validates access and auto-detects which capabilities are available: logs, metrics, traces, alert policies, and SLOs.
+  </Step>
+</Steps>
+
+## Observability tools available to the AI
+
+| Tool | What it does |
+|------|-------------|
+| **gcp_query_logs** | Query Cloud Logging with LQL filters (raw or patterns view with drain3 clustering) |
+| **gcp_aggregate_logs** | Aggregate logs by severity, resource type, or custom fields |
+| **gcp_query_traces** | Search Cloud Trace spans by service, duration, and status |
+| **gcp_query_metrics** | Query Cloud Monitoring time series (CPU, memory, custom metrics) |
+| **gcp_query_monitors** | List Alert Policies and their current state |
+| **gcp_query_slos** | List SLO definitions and compliance history |
+
+<Info>
+Your service account key never leaves the Sonarly backend. All GCP queries go through a server-side proxy using OAuth2 bearer tokens — keys are never exposed in sandboxes or logs.
+</Info>
+
+## Permissions needed
+
+The custom role includes these minimal read-only permissions:
+
+| Permission | Purpose |
+|-----------|---------|
+| `logging.logEntries.list` | Query Cloud Logging |
+| `logging.logs.list` | List available log names |
+| `monitoring.timeSeries.list` | Query Cloud Monitoring metrics |
+| `monitoring.alertPolicies.list` | List alert policies |
+| `monitoring.services.list` | List monitored services |
+| `monitoring.serviceLevelObjectives.list` | List SLOs |
+| `cloudtrace.traces.list` | Search traces |
+| `cloudtrace.traces.get` | Get trace details |

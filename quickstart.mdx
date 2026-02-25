@@ -32,11 +32,18 @@ Pick the tool you use most. You only need one to get started.
     3. Sonarly auto-creates a webhook contact point in Grafana
     4. Alert notifications are routed to Sonarly automatically
   </Tab>
-  <Tab title="PagerDuty / Incident.io / Opsgenie">
-    1. Go to **Settings** in your Sonarly dashboard
-    2. Copy the webhook URL for your platform
-    3. Add the webhook in your incident management platform settings
-    4. Incoming incidents trigger automatic investigation
+  <Tab title="GCP (Google Cloud)">
+    1. Go to **Connect GCP**
+    2. Enter your GCP Project ID
+    3. Create a read-only service account with the provided gcloud commands
+    4. Paste the service account JSON key
+    5. Sonarly detects available capabilities (logs, metrics, traces, alerts, SLOs)
+  </Tab>
+  <Tab title="SigNoz">
+    1. Go to **Connect SigNoz**
+    2. Enter your SigNoz URL and API key (Admin role recommended)
+    3. Sonarly auto-creates a webhook notification channel in SigNoz
+    4. New SigNoz alerts trigger automatic incident analysis
   </Tab>
 </Tabs>
 
