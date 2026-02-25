@@ -27,7 +27,7 @@ Sonarly follows the principle of least privilege:
 | **Sentry** | OAuth | Read-only: `org:read`, `project:read`, `event:read`, `member:read` |
 | **GitHub** | GitHub App | Contents read/write, Pull requests write, Metadata read (scoped to selected repos) |
 | **GitLab** | OAuth (`api` scope) | Read/write repo access (scoped to selected repos) |
-| **Slack** | OAuth | 9 bot scopes: `chat:write`, `channels:read`, `groups:read`, `channels:history`, `groups:history`, `channels:join`, `users:read`, `users:read.email`, `app_mentions:read` |
+| **Slack** | OAuth | 8 bot scopes: `chat:write`, `channels:read`, `groups:read`, `channels:history`, `groups:history`, `channels:join`, `users:read`, `users:read.email` |
 | **Datadog** | API Key + App Key | Read access to logs, monitors, traces, metrics, events, SLOs, RUM |
 | **Grafana** | Service account token | Viewer + Data sources: Explorer roles (read-only query access) |
 | **GCP** | Service account JSON key | Read-only: `logging.read`, `monitoring.read`, `trace.readonly` scopes |
