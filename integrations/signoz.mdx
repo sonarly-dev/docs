@@ -44,5 +44,11 @@ Your API key never leaves the Sonarly backend. All SigNoz queries go through a s
 
 | Role | What it enables |
 |------|----------------|
-| **Admin** (recommended) | Full access + automatic webhook setup |
-| **Viewer** | Read-only access, manual webhook setup required |
+| **Admin** (recommended) | Read access to all data + automatic webhook creation |
+| **Viewer** | Read-only access to logs, traces, metrics, alerts — manual webhook setup required |
+
+The Admin role is recommended because it allows Sonarly to automatically create a webhook notification channel in SigNoz. With Viewer, you'll need to manually add the webhook URL in SigNoz's **Settings** → **Alert Channels**:
+
+```
+https://sonarly.dev/api/webhooks/signoz?tenant_id=YOUR_TENANT_ID
+```

@@ -8,17 +8,34 @@ Sonarly connects to AWS CloudWatch to query your logs during incident investigat
 
 ## Connect CloudWatch
 
-<Steps>
-  <Step title="Create IAM credentials">
-    Create an IAM user or role with read-only access to CloudWatch Logs. Required permissions: `logs:DescribeLogGroups`, `logs:GetLogEvents`, `logs:FilterLogEvents`, `logs:GetLogGroupFields`.
-  </Step>
-  <Step title="Enter credentials">
-    On the Sonarly settings page, enter your AWS Access Key, Secret Key, and region.
-  </Step>
-  <Step title="Validation">
-    Sonarly validates access by listing your log groups.
-  </Step>
-</Steps>
+<Tabs>
+  <Tab title="IAM Role (recommended)">
+    <Steps>
+      <Step title="Create an IAM Role">
+        Create a cross-account IAM Role in your AWS account with the read-only policy below. Add Sonarly's AWS account as a trusted entity with an External ID (provided during setup).
+      </Step>
+      <Step title="Enter Role ARN">
+        On the Sonarly settings page, enter the Role ARN and your AWS region. Sonarly uses `sts:AssumeRole` with the External ID to get temporary credentials.
+      </Step>
+      <Step title="Validation">
+        Sonarly validates access by listing your log groups.
+      </Step>
+    </Steps>
+  </Tab>
+  <Tab title="Static credentials (legacy)">
+    <Steps>
+      <Step title="Create IAM credentials">
+        Create an IAM user with the read-only policy below. Generate an Access Key and Secret Key.
+      </Step>
+      <Step title="Enter credentials">
+        On the Sonarly settings page, enter your AWS Access Key, Secret Key, and region.
+      </Step>
+      <Step title="Validation">
+        Sonarly validates access by listing your log groups.
+      </Step>
+    </Steps>
+  </Tab>
+</Tabs>
 
 ## Observability tools available to the AI
 

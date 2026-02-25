@@ -35,6 +35,14 @@ Sonarly connects to Mezmo (formerly LogDNA) to query your logs during incident i
 Your Mezmo API key never leaves the Sonarly backend. All log queries go through a server-side proxy.
 </Info>
 
+## Permissions needed
+
+| Credential | Purpose |
+|-----------|---------|
+| **Service Key** | Authenticates all API requests (read-only log access) |
+
+The Service Key is found in **Settings** → **Organization** → **API Keys**. It grants read-only access to the Mezmo Export API, which Sonarly uses to query your logs. Sonarly never modifies your Mezmo data.
+
 ## Webhook alerts
 
 Mezmo can send alert webhooks to Sonarly when log patterns match your alert rules:

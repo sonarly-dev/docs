@@ -30,6 +30,21 @@ Sonarly supports self-hosted GitLab instances. During setup, enter your GitLab i
 - **Create merge requests** with fixes, root cause analysis, and git blame
 - **Auto-remove source branch** after MR is merged
 
+## Permissions
+
+Sonarly requests the `api` OAuth scope, which grants read/write access to the GitLab API. This is needed to:
+
+| Capability | Why |
+|-----------|-----|
+| **Read repositories** | Clone code for analysis |
+| **Create branches** | Push fix branches |
+| **Create merge requests** | Open MRs with fixes and root cause analysis |
+| **Read user info** | Identify the connected account |
+
+<Info>
+Repository access is scoped to the repositories you select during setup. Sonarly never accesses repos you haven't explicitly granted.
+</Info>
+
 ## Token management
 
 Sonarly uses standard OAuth 2.0 with 2-hour token expiry. Tokens are encrypted at rest and refreshed automatically before expiry. You can disconnect GitLab at any time from Settings.

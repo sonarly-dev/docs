@@ -44,7 +44,12 @@ The bot:
 
 | Scope | Purpose |
 |-------|---------|
-| `chat:write` | Send notifications to your channel |
-| `channels:read` | List channels for selection |
+| `chat:write` | Send notifications and bot responses to channels |
+| `channels:read` | List public channels for selection |
 | `groups:read` | List private channels for selection |
-| `app_mentions:read` | Respond when @mentioned |
+| `channels:history` | Read channel messages for bot context (when @mentioned) |
+| `groups:history` | Read private channel messages for bot context |
+| `channels:join` | Join channels to post notifications |
+| `users:read` | List workspace members (for git blame → Slack user mapping) |
+| `users:read.email` | Match Slack users to git commit authors by email |
+| `app_mentions:read` | Respond when the Sonarly bot is @mentioned |

@@ -60,7 +60,21 @@ Your service account token never leaves the Sonarly backend. All Grafana queries
 
 ## Permissions needed
 
+The service account requires two roles:
+
 | Role | Purpose |
 |------|---------|
-| **Viewer** | Read access to dashboards, datasources, alerts |
-| **Data sources: Explorer** | Query Prometheus, Loki, and Tempo via datasource proxy |
+| **Viewer** | Read access to dashboards, alert rules, and annotations |
+| **Data sources: Explorer** (fixed role) | Query Prometheus, Loki, and Tempo via the datasource proxy API |
+
+For automatic webhook setup, the service account also needs:
+
+| Permission | Purpose |
+|-----------|---------|
+| `alert.provisioning:write` | Create the Sonarly webhook contact point and notification route |
+
+<Tip>
+Alternatively, you can assign the **Editor** role (which includes all the above). If your service account lacks provisioning permissions, Sonarly will guide you through manual webhook setup instead.
+</Tip>
+
+Sonarly auto-detects which datasources are available (Loki, Tempo, Prometheus) and only enables the corresponding tools. Dashboard tools (`grafana_search_dashboards`, `grafana_get_dashboard_summary`, `grafana_get_dashboard_panel_queries`) are always available regardless of datasources.

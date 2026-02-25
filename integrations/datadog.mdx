@@ -59,7 +59,29 @@ Your API keys never leave the Sonarly backend. The AI agent queries Datadog thro
 
 ## Permissions needed
 
-| Key | Required permissions |
-|-----|---------------------|
-| **API Key** | Standard Datadog API key |
-| **Application Key** | Needs access to: Logs, Monitors, APM, Events, Webhooks |
+| Key | Purpose |
+|-----|---------|
+| **API Key** | Authenticates all API requests to Datadog |
+| **Application Key** | Scopes access — the user who creates it must have the required permissions |
+
+The Datadog user who creates the Application Key needs these permissions in their Datadog role:
+
+| Permission | Purpose |
+|-----------|---------|
+| **Logs Read Data** | Query logs during incident investigation |
+| **Monitors Read** | List monitors and their alert states |
+| **APM Traces Read** | Search APM spans and traces |
+| **Events Read** | Query monitor alert events |
+| **SLO Read** | List SLOs and compliance history |
+| **RUM Read** | Query Real User Monitoring data (if applicable) |
+
+For automatic webhook setup, the Application Key also needs:
+
+| Scope | Purpose |
+|-------|---------|
+| `create_webhooks` | Auto-create the Sonarly webhook in your Datadog account |
+| `monitor_config_policy_write` | Auto-create a notification rule to route alerts to the webhook |
+
+<Tip>
+If your Application Key doesn't have webhook creation scopes, Sonarly will still work — you'll just need to [create the webhook manually](https://docs.datadoghq.com/integrations/webhooks/) in Datadog pointing to your Sonarly webhook URL.
+</Tip>
