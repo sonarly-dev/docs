@@ -1,57 +1,104 @@
 ---
-title: "CloudWatch"
-description: "Connect AWS CloudWatch for log queries during incident investigation"
-icon: "cloud"
+title: "AWS"
+description: "Connect your AWS account for full-stack incident investigation with CloudWatch, CloudTrail, EC2, ECS, Lambda, RDS, and more"
+icon: "aws"
 ---
 
-Sonarly connects to AWS CloudWatch to query your logs during incident investigation. The AI agent can search, sample, and analyze log groups to find root causes.
+Sonarly connects to your AWS account via a cross-account IAM role, giving the AI agent full read-only access to CloudWatch logs, metrics, alarms, CloudTrail events, and infrastructure status (EC2, ECS, Lambda, RDS, ELB). The agent uses the AWS CLI directly to investigate incidents.
 
-## Connect CloudWatch
+## Connect AWS
 
-<Tabs>
-  <Tab title="IAM Role (recommended)">
-    <Steps>
-      <Step title="Create an IAM Role">
-        Create a cross-account IAM Role in your AWS account with the read-only policy below. Add Sonarly's AWS account as a trusted entity with an External ID (provided during setup).
-      </Step>
-      <Step title="Enter Role ARN">
-        On the Sonarly settings page, enter the Role ARN and your AWS region. Sonarly uses `sts:AssumeRole` with the External ID to get temporary credentials.
-      </Step>
-      <Step title="Validation">
-        Sonarly validates access by listing your log groups.
-      </Step>
-    </Steps>
-  </Tab>
-  <Tab title="Static credentials (legacy)">
-    <Steps>
-      <Step title="Create IAM credentials">
-        Create an IAM user with the read-only policy below. Generate an Access Key and Secret Key.
-      </Step>
-      <Step title="Enter credentials">
-        On the Sonarly settings page, enter your AWS Access Key, Secret Key, and region.
-      </Step>
-      <Step title="Validation">
-        Sonarly validates access by listing your log groups.
-      </Step>
-    </Steps>
-  </Tab>
-</Tabs>
+<Steps>
+  <Step title="Start setup">
+    Go to **Settings** → **Integrations** and click **Connect AWS**. Sonarly generates a unique External ID for your account.
+  </Step>
+  <Step title="Deploy the IAM Role">
+    Click **Launch CloudFormation** to open the AWS Console with a pre-filled CloudFormation stack. The template creates a `SonarlySREAgentRole` with read-only policies.
 
-## Observability tools available to the AI
+    Review the stack parameters (External ID and Sonarly Account ID are pre-filled) and click **Create stack**. Wait for the stack to reach `CREATE_COMPLETE`.
 
-| Tool | What it does |
-|------|-------------|
-| **List log groups** | Discover available CloudWatch log groups |
-| **Log statistics** | Get volume and field statistics for a log group |
-| **Sample logs** | Fetch recent log entries from a group |
-| **Search logs** | Filter logs by pattern, timeframe, and fields |
-| **Logs around time** | Get logs in a window around a specific timestamp |
+    <Accordion title="Manual setup (without CloudFormation)">
+      If you prefer to create the role manually:
+
+      1. Go to **IAM** → **Roles** → **Create Role**
+      2. Select **Another AWS account** as the trusted entity
+      3. Enter Sonarly's AWS Account ID (shown on the setup page)
+      4. Check **Require external ID** and paste the External ID from the setup page
+      5. Attach the 7 managed policies listed in the [Permissions](#permissions) section below
+      6. Name the role `SonarlySREAgentRole`
+    </Accordion>
+  </Step>
+  <Step title="Paste the Role ARN">
+    Copy the **Role ARN** from the CloudFormation Outputs tab and paste it in the Sonarly setup page. Select your primary AWS region.
+  </Step>
+  <Step title="Validation">
+    Sonarly assumes the role and lists your CloudWatch log groups to verify access.
+  </Step>
+</Steps>
+
+## How it works
+
+Unlike other observability integrations (Datadog, Grafana, SigNoz) that use server-side MCP tools, the AWS integration gives the AI agent direct access to the **AWS CLI** inside an isolated sandbox.
+
+1. Sonarly assumes your IAM role server-side via `sts:AssumeRole` with the External ID
+2. Temporary credentials (1-hour session) are written to the sandbox environment
+3. The agent runs `aws` CLI commands directly — no proxy, no MCP
+
+This gives the agent access to the full AWS CLI toolkit, not just a limited set of API wrappers.
+
+## Tools available to the AI
+
+### CloudWatch Logs
+
+| Command | What it does |
+|---------|-------------|
+| `aws logs describe-log-groups` | Discover available log groups |
+| `aws logs filter-log-events` | Search logs by pattern, timeframe, and log group |
+| `aws logs start-query` | Run CloudWatch Logs Insights queries (aggregation, stats) |
+| `aws cloudwatch describe-alarms` | List active alarms and their state |
+| `aws cloudwatch get-metric-statistics` | Pull metrics (CPU, errors, latency, memory, etc.) |
+
+### CloudTrail
+
+| Command | What it does |
+|---------|-------------|
+| `aws cloudtrail lookup-events` | Find recent API changes (deployments, config changes, permission changes) |
+
+### Infrastructure
+
+| Command | What it does |
+|---------|-------------|
+| `aws ec2 describe-instances` | Check EC2 instance status, IPs, security groups |
+| `aws ecs describe-services` | Check ECS service health, task counts, deployments |
+| `aws lambda get-function` | Inspect Lambda configuration, runtime, memory |
+| `aws rds describe-db-instances` | Check RDS status, connections, storage |
+| `aws elbv2 describe-target-health` | Check load balancer target health |
+| `aws autoscaling describe-scaling-activities` | Recent scaling events |
 
 <Info>
-Your AWS credentials never leave the Sonarly backend. All CloudWatch queries go through a server-side proxy.
+Your AWS credentials never leave the Sonarly backend. The agent runs in an isolated sandbox with temporary credentials that expire after 1 hour.
 </Info>
 
-## IAM policy example
+## Permissions
+
+The CloudFormation template attaches **7 AWS managed read-only policies** plus one inline policy:
+
+| Policy | What it covers |
+|--------|---------------|
+| `CloudWatchReadOnlyAccess` | Logs, metrics, alarms, dashboards |
+| `AWSCloudTrailReadOnlyAccess` | API audit trail |
+| `AmazonEC2ReadOnlyAccess` | Instances, VPCs, security groups |
+| `AmazonECS_ReadOnlyAccess` | ECS clusters, services, tasks |
+| `AWSLambda_ReadOnlyAccess` | Lambda functions, layers, event sources |
+| `AmazonRDSReadOnlyAccess` | RDS instances, clusters, snapshots |
+| `ElasticLoadBalancingReadOnly` | ALB/NLB target groups, listeners |
+| `health:Describe*` (inline) | AWS Health events |
+
+All policies are **read-only**. The agent cannot modify, create, or delete any AWS resources.
+
+### Trust policy
+
+The IAM role trusts only Sonarly's AWS account, and requires a matching External ID:
 
 ```json
 {
@@ -59,14 +106,25 @@ Your AWS credentials never leave the Sonarly backend. All CloudWatch queries go 
   "Statement": [
     {
       "Effect": "Allow",
-      "Action": [
-        "logs:DescribeLogGroups",
-        "logs:GetLogEvents",
-        "logs:FilterLogEvents",
-        "logs:GetLogGroupFields"
-      ],
-      "Resource": "*"
+      "Principal": {
+        "AWS": "arn:aws:iam::<sonarly-account-id>:root"
+      },
+      "Action": "sts:AssumeRole",
+      "Condition": {
+        "StringEquals": {
+          "sts:ExternalId": "<your-unique-external-id>"
+        }
+      }
     }
   ]
 }
 ```
+
+The External ID prevents [confused deputy attacks](https://docs.aws.amazon.com/IAM/latest/UserGuide/confused-deputy.html) — even if an attacker knows your Role ARN, they cannot assume it without your unique External ID.
+
+## Security
+
+- **No long-lived credentials** — Sonarly uses `sts:AssumeRole` with temporary credentials (1-hour sessions)
+- **External ID protection** — A unique UUID per tenant prevents confused deputy attacks
+- **Sandbox isolation** — Credentials are written to an isolated container, never shared between tenants
+- **Read-only only** — No write, create, or delete permissions on any AWS resource

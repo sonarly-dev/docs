@@ -39,6 +39,7 @@
               "integrations/gcp",
               "integrations/signoz",
               "integrations/cloudwatch",
+              "integrations/vercel",
               "integrations/mezmo"
             ]
           },

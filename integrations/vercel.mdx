@@ -1,0 +1,82 @@
+---
+title: "Vercel"
+description: "Connect Vercel for deployment logs and investigation during incidents"
+icon: "triangle"
+---
+
+Sonarly connects to Vercel to query your deployment logs, inspect deployments, and investigate incidents across your Vercel projects. The AI agent uses the Vercel CLI directly to search logs, analyze error patterns, and pinpoint problematic deployments.
+
+## Connect Vercel
+
+<Steps>
+  <Step title="Create an API token">
+    Go to [vercel.com/account/tokens](https://vercel.com/account/tokens) and create a new token named **Sonarly**. Use a **Full Account** scope token (or scope it to specific teams if preferred).
+  </Step>
+  <Step title="Enter the token">
+    On the Sonarly settings page, click **Connect Vercel** and paste your token. Sonarly validates it by fetching your account info and listing your projects.
+  </Step>
+  <Step title="Select a team (if applicable)">
+    If your Vercel account has multiple teams, select which team Sonarly should query. Projects under your Personal Account are also available.
+  </Step>
+  <Step title="Done">
+    Sonarly can now query your Vercel deployments and logs during incident investigations.
+  </Step>
+</Steps>
+
+## How it works
+
+The Vercel integration gives the AI agent direct access to the **Vercel CLI** inside an isolated sandbox — the same pattern as the AWS integration.
+
+1. Your API token is written to the sandbox environment (never shared with other tenants)
+2. The Vercel CLI (v50) is installed in the sandbox
+3. The agent runs `vercel` commands directly to query logs and inspect deployments
+
+## Tools available to the AI
+
+### Discovery
+
+| Command | What it does |
+|---------|-------------|
+| `vercel project ls` | List all projects in the account/team |
+| `vercel list <project>` | List recent deployments for a project |
+
+### Log querying
+
+| Command | What it does |
+|---------|-------------|
+| `vercel logs --since 1h --level error` | Fetch error logs from the last hour |
+| `vercel logs --since <start> --until <end>` | Query logs in a specific time window |
+| `vercel logs --level error --level warning` | Fetch both errors and warnings |
+
+The agent also performs **log pattern analysis** — grouping errors by message, route, HTTP status code, and detecting error spikes by minute.
+
+### Deployment inspection
+
+| Command | What it does |
+|---------|-------------|
+| `vercel inspect <deployment-id>` | Inspect a specific deployment (config, build output, environment) |
+| `vercel bisect --good <id> --bad <id>` | Binary search to find the deployment that introduced an issue |
+
+## Read-only access
+
+The agent can only run **read-only** Vercel commands. All destructive operations are blocked:
+
+- No deployments (`vercel deploy`, `vercel redeploy`, `vercel promote`)
+- No rollbacks (`vercel rollback`)
+- No project changes (`vercel rm`, `vercel pull`, `vercel link`)
+- No environment variable access (`vercel env add/rm/pull`)
+- No DNS or domain changes (`vercel domains`, `vercel dns`, `vercel alias`)
+- No blob storage writes (`vercel blob put/del`)
+- No raw API access (`vercel api`)
+
+<Info>
+Your Vercel token is written to an isolated sandbox and never shared between tenants. The token is used exclusively for read-only CLI commands.
+</Info>
+
+## Permissions
+
+| Credential | Purpose |
+|-----------|---------|
+| **API Token** | Authenticates all Vercel CLI commands (read-only usage) |
+
+Create the token at [vercel.com/account/tokens](https://vercel.com/account/tokens). A **Full Account** scope token is recommended. You can revoke it at any time to disconnect Sonarly.

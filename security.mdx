@@ -10,7 +10,7 @@ Sonarly is SOC 2 Type 2 certified. Security is built into every layer of the pla
 
 - **Sandboxed execution** — All code analysis runs in isolated containers. Each tenant gets a dedicated sandbox.
 - **No persistent storage** — Sandboxes have a 24-hour TTL. Your source code is never stored permanently.
-- **API keys never in sandbox** — Observability tool credentials (Datadog, Grafana, etc.) stay on the Sonarly backend. The AI agent queries logs via a server-side proxy.
+- **Credentials stay server-side when possible** — Datadog, Grafana, SigNoz, and GCP credentials stay on the Sonarly backend (queries go through a server-side proxy). AWS and Vercel use temporary/scoped credentials written to isolated sandboxes.
 
 ## Encryption
 
@@ -33,7 +33,8 @@ Sonarly follows the principle of least privilege:
 | **GCP** | Service account JSON key | Read-only: `logging.read`, `monitoring.read`, `trace.readonly` scopes |
 | **SigNoz** | API key | Read access (Admin recommended for auto-webhook setup) |
 | **Mezmo** | Service Key | Read-only log export access |
-| **CloudWatch** | IAM Role (cross-account) or static credentials | Read-only: `logs:DescribeLogGroups`, `logs:GetLogEvents`, `logs:FilterLogEvents`, `logs:GetLogGroupFields` |
+| **AWS** | IAM Role (cross-account AssumeRole) | Read-only: 7 AWS managed policies (CloudWatch, CloudTrail, EC2, ECS, Lambda, RDS, ELB) + `health:Describe*` |
+| **Vercel** | API Token | Read-only CLI access to projects, deployments, logs |
 
 ## Webhook verification
 
