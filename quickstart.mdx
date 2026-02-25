@@ -45,6 +45,24 @@ Pick the tool you use most. You only need one to get started.
     3. Sonarly auto-creates a webhook notification channel in SigNoz
     4. New SigNoz alerts trigger automatic incident analysis
   </Tab>
+  <Tab title="AWS">
+    1. Go to **Connect AWS**
+    2. Click **Launch CloudFormation** to deploy a read-only IAM role in your account
+    3. Copy the Role ARN from CloudFormation outputs and paste it in Sonarly
+    4. The AI agent gets full AWS CLI access (CloudWatch, CloudTrail, EC2, ECS, Lambda, RDS)
+  </Tab>
+  <Tab title="Vercel">
+    1. Go to **Connect Vercel**
+    2. Create an API token at [vercel.com/account/tokens](https://vercel.com/account/tokens)
+    3. Paste the token — Sonarly validates it and lists your projects
+    4. Select a team if applicable — the AI agent can now query your deployment logs
+  </Tab>
+  <Tab title="Mezmo">
+    1. Go to **Connect Mezmo**
+    2. Enter your Service Key (from Mezmo **Settings** → **Organization** → **API Keys**)
+    3. Sonarly validates access by querying your logs
+    4. Configure a webhook in Mezmo to route alerts to Sonarly
+  </Tab>
 </Tabs>
 
 ## 3. Connect your codebase
