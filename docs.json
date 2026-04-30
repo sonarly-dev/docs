@@ -67,6 +67,15 @@
             ]
           },
           {
+            "group": "Public API",
+            "pages": [
+              "api/introduction",
+              "api/bugs",
+              "api/incidents",
+              "api/webhooks"
+            ]
+          },
+          {
             "group": "Platform",
             "pages": ["security", "faq"]
           }

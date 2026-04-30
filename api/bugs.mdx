@@ -1,0 +1,189 @@
+---
+title: "Bugs"
+description: "Pull bugs and their AI analyses, run history, and dedup children"
+icon: "bug"
+---
+
+A `bug` represents a recurring error pattern Sonarly imported from one of your sources (Sentry, GitHub Issues, Bugsnag, session replay). Each bug carries the AI-generated analysis: title, severity, root cause, suggested fix, and a link to the open PR.
+
+## Endpoints
+
+| Method | Path | Returns |
+|---|---|---|
+| `GET` | `/v1/public/bugs` | List of bugs, newest first. |
+| `GET` | `/v1/public/bugs/{id}` | A single bug. |
+| `GET` | `/v1/public/bugs/{id}/runs` | All Claude Code runs for a bug. |
+| `GET` | `/v1/public/bugs/{id}/duplicates` | Children that were deduped into this bug. |
+
+`{id}` accepts both `bug_42` and bare `42`.
+
+## List bugs
+
+```bash
+GET /v1/public/bugs
+```
+
+### Query parameters
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `limit` | int (1–100) | `20` | Page size. |
+| `starting_after` | cursor | — | A `bug_<id>` from a previous page. |
+| `severity` | csv | — | `critical,high,medium,low,resolved`. |
+| `status` | string | — | `open` or `resolved`. |
+| `created[gte]` | unix s | — | Only bugs created at/after this time. |
+| `created[lte]` | unix s | — | Only bugs created at/before this time. |
+
+### Example
+
+<CodeGroup>
+```bash curl
+curl -H "Authorization: Bearer $SONARLY_KEY" \
+  "https://app.sonarly.dev/api/v1/public/bugs?limit=20&severity=critical,high"
+```
+
+```typescript Node.js
+const r = await fetch(
+  "https://app.sonarly.dev/api/v1/public/bugs?limit=20&severity=critical,high",
+  { headers: { Authorization: `Bearer ${process.env.SONARLY_KEY}` } }
+)
+const { data, has_more } = await r.json()
+```
+
+```python Python
+import requests
+
+r = requests.get(
+    "https://app.sonarly.dev/api/v1/public/bugs",
+    headers={"Authorization": f"Bearer {os.environ['SONARLY_KEY']}"},
+    params={"limit": 20, "severity": "critical,high"},
+)
+data = r.json()
+```
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "bug_1929",
+      "object": "bug",
+      "source": "sentry",
+      "status": "open",
+      "severity": "critical",
+      "title": "LangSmith search_runs error: Project not found",
+      "description": "...",
+      "summary": "...",
+      "user_impact": "Users querying agent runs see 500 errors.",
+      "root_cause": "...",
+      "suggested_fix": "Add null-check on project lookup.",
+      "blame_commit_sha": "abc123",
+      "fixable_in_code": true,
+      "confidence": 0.85,
+      "pr_url": "https://github.com/org/repo/pull/123",
+      "agent_url": "https://app.sonarly.dev/run/3028",
+      "branch_name": "sonarly-1929-fix-langsmith",
+      "repository": "org/repo",
+      "error_type": "ValueError",
+      "error_message": "Project not found",
+      "occurrence_count": 5,
+      "total_user_count": 0,
+      "first_seen": 1776642782,
+      "last_seen": 1777467038,
+      "created": 1777408645,
+      "analyzed_at": 1777411939,
+      "sentry_issue_id": "7425573869",
+      "sentry_url": "https://sentry.io/...",
+      "github_issue_url": null,
+      "github_repo": null,
+      "github_issue_number": null,
+      "parent_bug_id": null,
+      "dedup_reason": null,
+      "dedup_confidence": null,
+      "assigned_owner": null,
+      "sonarly_url": "https://app.sonarly.dev/issue/1929?type=bug"
+    }
+  ],
+  "has_more": true,
+  "url": "/v1/public/bugs"
+}
+```
+
+## Get a bug
+
+```bash
+GET /v1/public/bugs/{id}
+```
+
+Returns the full bug object — same shape as items in the list response. Returns `404` if the bug doesn't exist or belongs to a different tenant.
+
+## List runs for a bug
+
+```bash
+GET /v1/public/bugs/{id}/runs
+```
+
+Each Claude Code execution against this bug — successful, failed, or in-progress. Newest first. Useful for inspecting the analysis history (initial attempt, retries, follow-up chats).
+
+```json
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "run_3028",
+      "object": "agent_run",
+      "mode": "bug_fix",
+      "status": "completed",
+      "trigger_source": "sentry_webhook",
+      "bug_id": "bug_1929",
+      "incident_group_id": null,
+      "is_group_duplicate": false,
+      "repository": "org/repo",
+      "provider": "github",
+      "branch_name": "sonarly-1929-fix-langsmith",
+      "pr_url": "https://github.com/org/repo/pull/123",
+      "pr_merged": true,
+      "analysis": {
+        "title": "...",
+        "severity": "critical",
+        "summary": "...",
+        "user_impact": "...",
+        "root_cause": "...",
+        "suggested_fix": "...",
+        "fixable_in_code": true
+      },
+      "feedback": null,
+      "error_message": null,
+      "created": 1777411939,
+      "started_at": 1777411983,
+      "completed_at": 1777412419
+    }
+  ],
+  "has_more": false,
+  "url": "/v1/public/bugs/bug_1929/runs"
+}
+```
+
+## List duplicates
+
+```bash
+GET /v1/public/bugs/{id}/duplicates
+```
+
+Returns child bugs that were deduplicated into this one (same root cause, different occurrences). Each child has the full Bug schema, with `parent_bug_id` pointing back to the parent.
+
+## Source field
+
+The `source` field tells you where the bug came from:
+
+| Source | Description |
+|---|---|
+| `sentry` | Imported from Sentry (webhook, poller, or bulk import). |
+| `github_issue` | A GitHub Issue that Sonarly was tagged in. |
+| `bugsnag` | Imported from Bugsnag. |
+| `session_replay` | Detected from a session replay recording. |
+
+The bug's other fields adapt to the source — e.g., `sentry_issue_id` is set only when `source: "sentry"`, while `github_issue_url` / `github_issue_number` are set when `source: "github_issue"`.

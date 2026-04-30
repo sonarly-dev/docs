@@ -1,0 +1,119 @@
+---
+title: "Introduction"
+description: "REST API for pulling bugs, incidents, and analyses from Sonarly, plus outbound webhooks for real-time updates"
+icon: "code"
+---
+
+The Sonarly Public API lets you bring Sonarly's AI bug analyses into your own tools — CRMs, internal dashboards, ticketing systems, anything you can POST to.
+
+Two primitives:
+
+- **REST endpoints** — pull bugs, incidents, and analysis runs on your own schedule.
+- **Outbound webhooks** — receive real-time POSTs when bugs are imported, analyzed, deduped, or fixed.
+
+Get started in 2 minutes: create an API key + webhook endpoint at <a href="https://app.sonarly.dev/developers">app.sonarly.dev/developers</a>.
+
+## Base URL
+
+```
+https://app.sonarly.dev/api/v1/public
+```
+
+## Authentication
+
+Every request requires a Bearer token:
+
+```bash
+curl -H "Authorization: Bearer sk_live_..." \
+  https://app.sonarly.dev/api/v1/public/bugs
+```
+
+Tokens are tenant-scoped, read-only by default, and never expire unless rotated. The full secret is shown **once** at creation — copy it then. We display only `sk_live_abc1•••••a3f9` thereafter.
+
+<Note>
+On `401 Unauthorized`: the key is invalid, revoked, or expired. Reissue from <a href="https://app.sonarly.dev/developers">the dashboard</a>.
+</Note>
+
+## Response headers
+
+Every response includes:
+
+| Header | Meaning |
+|---|---|
+| `X-Request-ID` | UUID — paste this when reporting issues. |
+| `RateLimit-Limit` | Per-minute quota (default 1000). |
+| `RateLimit-Remaining` | Tokens left in the bucket. |
+| `RateLimit-Reset` | Seconds until the bucket fully refills. |
+| `Retry-After` | Seconds to wait — only on `429 Too Many Requests`. |
+
+On `429`, back off for `Retry-After` seconds before retrying.
+
+## Pagination
+
+Cursor-based, Stripe-style. Every list endpoint returns:
+
+```json
+{
+  "object": "list",
+  "data": [{ "id": "bug_42", ... }, ...],
+  "has_more": true,
+  "url": "/v1/public/bugs"
+}
+```
+
+Pass `starting_after` with the last id of the previous page:
+
+```bash
+curl ".../v1/public/bugs?limit=50"
+curl ".../v1/public/bugs?limit=50&starting_after=bug_42"
+```
+
+For incremental sync, combine with `created[gte]`:
+
+```bash
+# fetch everything created since the last poll
+curl ".../v1/public/bugs?created[gte]=1714470180&limit=100"
+```
+
+Save the largest `created` value you see and pass it back as `created[gte]` next time. Cursor pagination + `created` filter together survive concurrent inserts cleanly.
+
+## Errors
+
+All errors follow a consistent envelope:
+
+```json
+HTTP/1.1 404 Not Found
+{ "errors": ["Bug not found: bug_999"] }
+```
+
+| Status | Meaning |
+|---|---|
+| `400` | Bad request — invalid cursor, malformed filter, etc. |
+| `401` | Missing, invalid, or revoked API key. |
+| `403` | API key lacks required permission. |
+| `404` | Resource not found, or belongs to a different tenant. |
+| `429` | Rate-limited. Back off for `Retry-After` seconds. |
+| `5xx` | Server error. Safe to retry with exponential backoff. |
+
+## Versioning
+
+The current API version is `2026-04-30`. We **never remove or rename a field** in a published version — additions only.
+
+When a new version ships, both run in parallel. Deprecations carry `Deprecation` and `Sunset` HTTP headers ([RFC 8594](https://datatracker.ietf.org/doc/html/rfc8594)) with a 6-month minimum window before removal.
+
+## Resources
+
+<CardGroup cols={2}>
+  <Card title="Bugs" icon="bug" href="/api/bugs">
+    Recurring errors imported from Sentry, GitHub, Bugsnag, and others.
+  </Card>
+  <Card title="Incidents" icon="bell" href="/api/incidents">
+    Real-time alerts from Datadog, Grafana, GCP, SigNoz, Better Stack, and Slack/Discord mentions.
+  </Card>
+  <Card title="Webhooks" icon="webhook" href="/api/webhooks">
+    Receive signed POSTs the moment something changes.
+  </Card>
+  <Card title="Support" icon="life-ring" href="mailto:founders@sonarly.dev">
+    Paste your `X-Request-ID` — we look up the full audit trail by ID.
+  </Card>
+</CardGroup>

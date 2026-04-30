@@ -1,0 +1,160 @@
+---
+title: "Incidents"
+description: "Pull incident groups and their AI investigations"
+icon: "bell"
+---
+
+An `incident` is a deduped group of alerts from your observability stack — Datadog, Grafana, GCP, SigNoz, Better Stack, or a Slack/Discord `@Sonarly` mention. Unlike a bug (a recurring error pattern), an incident represents an alert that fired and is being actively investigated.
+
+## Endpoints
+
+| Method | Path | Returns |
+|---|---|---|
+| `GET` | `/v1/public/incidents` | List of incident groups, newest first. |
+| `GET` | `/v1/public/incidents/{id}` | A single incident. |
+| `GET` | `/v1/public/incidents/{id}/runs` | Claude Code investigation runs for an incident. |
+
+`{id}` accepts both `inc_42` and bare `42`.
+
+## List incidents
+
+```bash
+GET /v1/public/incidents
+```
+
+### Query parameters
+
+| Name | Type | Default | Notes |
+|---|---|---|---|
+| `limit` | int (1–100) | `20` | Page size. |
+| `starting_after` | cursor | — | An `inc_<id>` from a previous page. |
+| `severity` | csv | — | `critical,high,medium,low`. |
+| `status` | string | — | `active`, `resolved`, or `muted`. |
+| `created[gte]` | unix s | — | Only incidents created at/after this time. |
+| `created[lte]` | unix s | — | Only incidents created at/before this time. |
+
+### Example
+
+<CodeGroup>
+```bash curl
+curl -H "Authorization: Bearer $SONARLY_KEY" \
+  "https://app.sonarly.dev/api/v1/public/incidents?status=active&limit=20"
+```
+
+```typescript Node.js
+const r = await fetch(
+  "https://app.sonarly.dev/api/v1/public/incidents?status=active&limit=20",
+  { headers: { Authorization: `Bearer ${process.env.SONARLY_KEY}` } }
+)
+```
+
+```python Python
+import requests
+r = requests.get(
+    "https://app.sonarly.dev/api/v1/public/incidents",
+    headers={"Authorization": f"Bearer {os.environ['SONARLY_KEY']}"},
+    params={"status": "active", "limit": 20},
+)
+```
+</CodeGroup>
+
+### Response
+
+```json
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "inc_27",
+      "object": "incident",
+      "title": "KeyError on missing sentry_issue_ids",
+      "severity": "high",
+      "status": "active",
+      "summary": "The batch dedup builder crashed on incomplete groups...",
+      "root_cause_explanation": "## Proximate Cause\n...",
+      "suggested_fix": "Use .get() with safe defaults.",
+      "occurrence_count": 1,
+      "first_seen": 1773709503,
+      "last_seen": 1773709503,
+      "created": 1773709503,
+      "updated": 1773709503,
+      "pr_url": null,
+      "assigned_owner": null,
+      "sonarly_url": "https://app.sonarly.dev/issue/27?type=incident"
+    }
+  ],
+  "has_more": true,
+  "url": "/v1/public/incidents"
+}
+```
+
+## Get an incident
+
+```bash
+GET /v1/public/incidents/{id}
+```
+
+Returns the full incident object — same shape as items in the list response. Returns `404` if the incident doesn't exist or belongs to a different tenant.
+
+## List runs for an incident
+
+```bash
+GET /v1/public/incidents/{id}/runs
+```
+
+Every Claude Code investigation tied to this incident group. Each run carries the analysis (title, severity, root cause, fix), repository / branch / PR if applicable, and run lifecycle timestamps.
+
+The `mode` field is `incident` for these runs (vs `bug_fix` for bug runs).
+
+```json
+{
+  "object": "list",
+  "data": [
+    {
+      "id": "run_4112",
+      "object": "agent_run",
+      "mode": "incident",
+      "status": "completed",
+      "trigger_source": "datadog",
+      "bug_id": null,
+      "incident_group_id": "inc_27",
+      "is_group_duplicate": false,
+      "repository": "org/repo",
+      "provider": "github",
+      "branch_name": "sonarly-inc-4112-fix",
+      "pr_url": "https://github.com/org/repo/pull/456",
+      "pr_merged": false,
+      "analysis": {
+        "title": "...",
+        "severity": "high",
+        "summary": "...",
+        "root_cause": "...",
+        "suggested_fix": "...",
+        "fixable_in_code": true
+      },
+      "feedback": null,
+      "error_message": null,
+      "created": 1773709503,
+      "started_at": 1773709520,
+      "completed_at": 1773709891
+    }
+  ],
+  "has_more": false,
+  "url": "/v1/public/incidents/inc_27/runs"
+}
+```
+
+## Bug vs Incident — when to use which
+
+Both resources expose Sonarly analyses, but they model different signals:
+
+| | `bug` | `incident` |
+|---|---|---|
+| Origin | Recurring error pattern | One-off alert that fired |
+| Sources | Sentry, GitHub Issues, Bugsnag, session replay | Datadog, Grafana, GCP, SigNoz, Better Stack, Slack/Discord mentions |
+| Lifecycle | `open` → `resolved` → can `reappear` | `active` → `resolved` / `muted` |
+| Has occurrence count | Yes (`occurrence_count`) | Yes, but each alert is grouped |
+| Identity | `sentry_issue_id` etc. | Group of correlated alerts |
+| Webhook events | `bug.*` family | `incident.*` family |
+
+For a unified "all signals" view, query both endpoints and concatenate the results — they share the same envelope and pagination shape.

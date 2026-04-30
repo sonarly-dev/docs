@@ -1,0 +1,249 @@
+---
+title: "Webhooks"
+description: "Receive real-time signed POSTs the moment something changes"
+icon: "webhook"
+---
+
+Configure a receiver URL at <a href="https://app.sonarly.dev/developers">app.sonarly.dev/developers</a>. Sonarly POSTs a signed JSON envelope to your URL whenever a subscribed event fires.
+
+Webhooks deliver the same data as the REST API — the difference is push vs pull. Use them when you want sub-second updates instead of polling.
+
+## Quick start
+
+<Steps>
+  <Step title="Create an endpoint">
+    Go to **Developers → Webhook Endpoints → Add Endpoint**. Enter your HTTPS URL, pick which events to subscribe to (or `*` for all), and save. Sonarly returns a `whsec_…` signing secret — **copy it now**, it won't be shown again.
+  </Step>
+  <Step title="Verify the signature">
+    On every request, compute `HMAC-SHA256(secret, f"{t}.{raw_body}")` and compare it (constant-time) to the `v1=` segment of the `Sonarly-Signature` header. See [Verifying signatures](#verifying-signatures).
+  </Step>
+  <Step title="Respond 2xx within 10 seconds">
+    Sonarly retries on 5xx and network errors with exponential backoff. 4xx responses (except 408/425/429) are treated as terminal — don't return 4xx unless the endpoint is permanently misconfigured.
+  </Step>
+  <Step title="Dedupe by event id">
+    Every event has a stable `id` (`evt_…`) that's preserved across retries. Use it as a primary key in your processed-events table.
+  </Step>
+</Steps>
+
+## Event types
+
+| Event | Fires when |
+|---|---|
+| `bug.created` | A new bug is imported (Sentry webhook, poller, GitHub Issue, etc.). |
+| `bug.analyzed` | A Claude Code analysis run completes for a bug. |
+| `bug.deduped` | A bug is merged into a parent (same root cause). |
+| `bug.reappeared` | A previously resolved bug fires again. |
+| `bug.resolved` | A bug is marked resolved (manual or auto). |
+| `bug.pr_created` | Sonarly opens a fix PR for a bug. |
+| `bug.pr_merged` | A Sonarly bug-fix PR gets merged. |
+| `incident.created` | A new incident group is created from an alert. |
+| `incident.analyzed` | An incident's Claude Code investigation completes. |
+| `incident.resolved` | An incident is marked resolved. |
+| `ping` | Test event from the dashboard's "Send test" button. |
+
+Subscribe to specific events or pass `["*"]` for the full firehose.
+
+## Envelope
+
+```json
+{
+  "id": "evt_01HZXR8K3M5N7Q9TYV2WBCDF4G",
+  "type": "bug.analyzed",
+  "api_version": "2026-04-30",
+  "created": 1714470180,
+  "tenant_id": 300,
+  "data": {
+    "object": { /* full Bug or Incident, identical shape to GET endpoints */ },
+    "previous_attributes": null
+  }
+}
+```
+
+The `data.object` field has the **same shape** as the corresponding REST endpoint response (`/v1/public/bugs/{id}` or `/v1/public/incidents/{id}`). If you already wrote serializers for the REST API, they work as-is for webhooks.
+
+## Headers
+
+Every request carries:
+
+| Header | Example |
+|---|---|
+| `Sonarly-Signature` | `t=1714470180,v1=a3f4...` |
+| `Sonarly-Event-Id` | `evt_01HZXR8K3M5N7Q9TYV2WBCDF4G` |
+| `Sonarly-Event-Type` | `bug.analyzed` |
+| `Sonarly-Delivery-Id` | UUID — unique per attempt |
+| `User-Agent` | `Sonarly-Webhooks/1.0` |
+| `Content-Type` | `application/json` |
+
+The `Event-Id` is stable across retries (use it for dedup); the `Delivery-Id` changes per attempt.
+
+## Verifying signatures
+
+<CodeGroup>
+```typescript Node.js / TypeScript
+import crypto from "crypto"
+
+export function verifySonarlySignature(
+  rawBody: string,        // MUST be raw, BEFORE JSON.parse
+  header: string | null,
+  secret: string,
+  toleranceSec = 300,
+): boolean {
+  if (!header) return false
+  const parts = Object.fromEntries(
+    header.split(",").map(p => {
+      const [k, ...v] = p.split("=")
+      return [k.trim(), v.join("=")]
+    })
+  )
+  const t = parseInt(parts.t, 10)
+  if (!t || Math.abs(Date.now() / 1000 - t) > toleranceSec) return false
+
+  const expected = crypto
+    .createHmac("sha256", secret)
+    .update(`${t}.${rawBody}`)
+    .digest("hex")
+  const a = Buffer.from(expected, "hex")
+  const b = Buffer.from(parts.v1, "hex")
+  return a.length === b.length && crypto.timingSafeEqual(a, b)
+}
+```
+
+```python Python
+import hashlib, hmac, time
+
+def verify_sonarly_signature(
+    body: bytes,
+    header: str,
+    secret: str,
+    tolerance_seconds: int = 300,
+) -> bool:
+    parts = dict(p.strip().split("=", 1) for p in header.split(","))
+    t = int(parts["t"])
+    if abs(time.time() - t) > tolerance_seconds:
+        return False
+    expected = hmac.new(
+        secret.encode("utf-8"),
+        f"{t}.".encode("utf-8") + body,
+        hashlib.sha256,
+    ).hexdigest()
+    return hmac.compare_digest(expected.encode(), parts["v1"].encode())
+```
+
+```go Go
+package main
+
+import (
+    "crypto/hmac"
+    "crypto/sha256"
+    "encoding/hex"
+    "fmt"
+    "strconv"
+    "strings"
+    "time"
+)
+
+func VerifySonarlySignature(body []byte, header, secret string, toleranceSec int64) bool {
+    parts := map[string]string{}
+    for _, p := range strings.Split(header, ",") {
+        kv := strings.SplitN(strings.TrimSpace(p), "=", 2)
+        if len(kv) == 2 {
+            parts[kv[0]] = kv[1]
+        }
+    }
+    t, err := strconv.ParseInt(parts["t"], 10, 64)
+    if err != nil { return false }
+    if delta := time.Now().Unix() - t; delta < -toleranceSec || delta > toleranceSec {
+        return false
+    }
+    mac := hmac.New(sha256.New, []byte(secret))
+    fmt.Fprintf(mac, "%d.", t)
+    mac.Write(body)
+    expected := hex.EncodeToString(mac.Sum(nil))
+    return hmac.Equal([]byte(expected), []byte(parts["v1"]))
+}
+```
+</CodeGroup>
+
+<Warning>
+Capture the **raw request body** before any JSON middleware re-parses it. Re-serializing changes whitespace and key order, which invalidates the signature.
+
+In Express: `app.use("/webhooks/sonarly", express.raw({ type: "application/json" }))`.
+
+In Next.js Route Handlers: `await req.text()` (not `req.json()`).
+
+In FastAPI: `await request.body()` (not the JSON parser).
+</Warning>
+
+## Idempotency
+
+Sonarly retries on 5xx and network errors. Even on success, the network can deliver the same event twice. Treat every receiver handler as idempotent:
+
+```typescript
+const eventId = req.headers["sonarly-event-id"]
+const inserted = await db.execute(
+  "INSERT INTO processed_webhook_events (event_id) VALUES (?) ON CONFLICT DO NOTHING",
+  [eventId],
+)
+if (inserted.rowsAffected === 0) {
+  return res.status(200).json({ ok: true, deduped: true })
+}
+// ... process the event ...
+```
+
+## Delivery semantics
+
+| Property | Value |
+|---|---|
+| Timeout | 10 seconds |
+| Retry on | `5xx`, `408`, `425`, `429`, network errors |
+| No retry on | Other `4xx` — fix your endpoint config |
+| Schedule | immediate, +5 s, +5 m, +30 m, +2 h, +5 h, +10 h, +24 h |
+| Max attempts | 8 |
+| Endpoint disabled | After ~3 days of consecutive failures |
+
+When an endpoint is disabled, the dashboard surfaces the failure reason and a one-click "re-enable" action.
+
+## Delivery log
+
+Every delivery — success, failure, expired — is recorded in the dashboard for 30 days. Each row shows:
+
+- Timestamp + latency
+- Event type + event id
+- HTTP status + response body (truncated to 4 KB)
+- Attempt number
+- A **Retry now** button to force re-attempt
+
+When you report a delivery issue, include the **Sonarly-Delivery-Id** header value and we can correlate to the exact row.
+
+## Security
+
+### Signature mandatory
+
+Always verify `Sonarly-Signature` on every incoming request. Without verification, your endpoint is publicly POSTable by anyone.
+
+### HTTPS only
+
+Sonarly refuses to register `http://` URLs in production. The dashboard rejects them at create-time.
+
+### SSRF protection on our side
+
+When you provide a URL, Sonarly resolves it and rejects any address that maps to:
+
+- Loopback (`127.0.0.0/8`, `::1`)
+- Link-local (`169.254.0.0/16`, including AWS metadata)
+- RFC1918 private ranges (`10/8`, `172.16/12`, `192.168/16`)
+- IPv6 ULA / multicast / reserved
+
+This protects the Sonarly infrastructure from being used to scan internal addresses.
+
+### Rotating the secret
+
+To rotate, delete the endpoint and recreate it. The new secret displays once; update your receiver and resume.
+
+For zero-downtime rotation across both old and new secrets simultaneously, contact us.
+
+## Data scope
+
+Webhook payloads may contain user-generated content from your error tracking system — stack traces with PII, error messages with email addresses, etc. By default Sonarly does **not** scrub these fields. You are responsible for processing this data per your privacy policy.
+
+If you need server-side scrubbing on Sonarly's end, contact us — we can flip a per-tenant flag.
