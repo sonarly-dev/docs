@@ -11,12 +11,12 @@ Two primitives:
 - **REST endpoints** — pull bugs, incidents, and analysis runs on your own schedule.
 - **Outbound webhooks** — receive real-time POSTs when bugs are imported, analyzed, deduped, or fixed.
 
-Get started in 2 minutes: create an API key + webhook endpoint at <a href="https://app.sonarly.dev/developers">app.sonarly.dev/developers</a>.
+Get started in 2 minutes: create an API key + webhook endpoint at <a href="https://sonarly.com/developers">sonarly.com/developers</a>.
 
 ## Base URL
 
 ```
-https://app.sonarly.dev/api/v1/public
+https://sonarly.com/api/v1/public
 ```
 
 ## Authentication
@@ -25,13 +25,13 @@ Every request requires a Bearer token:
 
 ```bash
 curl -H "Authorization: Bearer sk_live_..." \
-  https://app.sonarly.dev/api/v1/public/bugs
+  https://sonarly.com/api/v1/public/bugs
 ```
 
 Tokens are tenant-scoped, read-only by default, and never expire unless rotated. The full secret is shown **once** at creation — copy it then. We display only `sk_live_abc1•••••a3f9` thereafter.
 
 <Note>
-On `401 Unauthorized`: the key is invalid, revoked, or expired. Reissue from <a href="https://app.sonarly.dev/developers">the dashboard</a>.
+On `401 Unauthorized`: the key is invalid, revoked, or expired. Reissue from <a href="https://sonarly.com/developers">the dashboard</a>.
 </Note>
 
 ## Response headers

@@ -39,12 +39,12 @@ GET /v1/public/bugs
 <CodeGroup>
 ```bash curl
 curl -H "Authorization: Bearer $SONARLY_KEY" \
-  "https://app.sonarly.dev/api/v1/public/bugs?limit=20&severity=critical,high"
+  "https://sonarly.com/api/v1/public/bugs?limit=20&severity=critical,high"
 ```
 
 ```typescript Node.js
 const r = await fetch(
-  "https://app.sonarly.dev/api/v1/public/bugs?limit=20&severity=critical,high",
+  "https://sonarly.com/api/v1/public/bugs?limit=20&severity=critical,high",
   { headers: { Authorization: `Bearer ${process.env.SONARLY_KEY}` } }
 )
 const { data, has_more } = await r.json()
@@ -54,7 +54,7 @@ const { data, has_more } = await r.json()
 import requests
 
 r = requests.get(
-    "https://app.sonarly.dev/api/v1/public/bugs",
+    "https://sonarly.com/api/v1/public/bugs",
     headers={"Authorization": f"Bearer {os.environ['SONARLY_KEY']}"},
     params={"limit": 20, "severity": "critical,high"},
 )
@@ -84,7 +84,7 @@ data = r.json()
       "fixable_in_code": true,
       "confidence": 0.85,
       "pr_url": "https://github.com/org/repo/pull/123",
-      "agent_url": "https://app.sonarly.dev/run/3028",
+      "agent_url": "https://sonarly.com/run/3028",
       "branch_name": "sonarly-1929-fix-langsmith",
       "repository": "org/repo",
       "error_type": "ValueError",
@@ -104,7 +104,7 @@ data = r.json()
       "dedup_reason": null,
       "dedup_confidence": null,
       "assigned_owner": null,
-      "sonarly_url": "https://app.sonarly.dev/issue/1929?type=bug"
+      "sonarly_url": "https://sonarly.com/issue/1929?type=bug"
     }
   ],
   "has_more": true,

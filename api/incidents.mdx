@@ -38,12 +38,12 @@ GET /v1/public/incidents
 <CodeGroup>
 ```bash curl
 curl -H "Authorization: Bearer $SONARLY_KEY" \
-  "https://app.sonarly.dev/api/v1/public/incidents?status=active&limit=20"
+  "https://sonarly.com/api/v1/public/incidents?status=active&limit=20"
 ```
 
 ```typescript Node.js
 const r = await fetch(
-  "https://app.sonarly.dev/api/v1/public/incidents?status=active&limit=20",
+  "https://sonarly.com/api/v1/public/incidents?status=active&limit=20",
   { headers: { Authorization: `Bearer ${process.env.SONARLY_KEY}` } }
 )
 ```
@@ -51,7 +51,7 @@ const r = await fetch(
 ```python Python
 import requests
 r = requests.get(
-    "https://app.sonarly.dev/api/v1/public/incidents",
+    "https://sonarly.com/api/v1/public/incidents",
     headers={"Authorization": f"Bearer {os.environ['SONARLY_KEY']}"},
     params={"status": "active", "limit": 20},
 )
@@ -80,7 +80,7 @@ r = requests.get(
       "updated": 1773709503,
       "pr_url": null,
       "assigned_owner": null,
-      "sonarly_url": "https://app.sonarly.dev/issue/27?type=incident"
+      "sonarly_url": "https://sonarly.com/issue/27?type=incident"
     }
   ],
   "has_more": true,
